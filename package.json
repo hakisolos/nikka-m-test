@@ -27,7 +27,6 @@
   "homepage": "https://github.com/hakisolos/nikka-x-md#readme",
   "dependencies": {
     "@adiwajshing/baileys": "^5.0.0",
-    "haki-baileys": "github:haki-xerr/haki-baileys",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@bochilteam/scraper": "3.0.0",
     "@neeraj-x0/textpro": "^1.0.3",
@@ -35,6 +34,7 @@
     "@whiskeysockets/baileys": "6.7.9",
     "archiver": "^5.3.1",
     "axios": "^1.3.3",
+    "haki-baileys": "github:haki-xerr/haki-baileys",
     "bitly": "^7.1.2",
     "browser-id3-writer": "^4.4.0",
     "chatgpt": "^5.2.5",
