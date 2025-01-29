@@ -27,7 +27,7 @@
   "homepage": "https://github.com/hakisolos/nikka-x-md#readme",
   "dependencies": {
     "@adiwajshing/baileys": "^5.0.0",
-    "haki-baileys": "git.https://github.com/haki-xerr/haki-baileys"
+    "haki-baileys": "git.https://github.com/haki-xerr/haki-baileys",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@bochilteam/scraper": "3.0.0",
     "@neeraj-x0/textpro": "^1.0.3",
