@@ -5,7 +5,7 @@ const {
   useMultiFileAuthState,
   Browsers,
   makeInMemoryStore,
-} = require("@whiskeysockets/baileys");
+} = require("haki-baileys");
 const fs = require("fs");
 const { serialize } = require("./lib/serialize");
 const { Message } = require("./lib/Base");
