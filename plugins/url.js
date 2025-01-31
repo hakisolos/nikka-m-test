@@ -61,6 +61,8 @@ command(
         !message.reply_message ||
         (!message.reply_message.image &&
           !message.reply_message.sticker &&
+          !message.reply_message.audio &&
+          !message.reply_message.document &&
           !message.reply_message.video)
       ) {
         return await message.reply(
