@@ -854,3 +854,30 @@ command(
         }
     }
 );
+const { downloadMediaMessage } = require("@whiskeysockets/baileys");
+
+command(
+  {
+    pattern: "vv",
+    fromMe: isPrivate,
+    desc: "Forwards the View Once message",
+    type: "tool",
+  },
+  async (message, match) => {
+
+    if (!message.reply_message) {
+      return await message.reply("Reply to a View Once message.");
+    }
+
+    try {
+      await message.react("⏳️")	    
+      let buff = await downloadMediaMessage(message.reply_message, "buffer");
+      return await message.sendFile(buff);
+      await message.react("⏳️")
+    } catch (err) {
+      console.error(err);
+      return await message.reply("Failed to download media.");
+    }
+  }
+);
+
