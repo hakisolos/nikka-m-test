@@ -32,3 +32,24 @@ command(
     }
   }
 );
+command(
+    {
+        pattern: "isbot",
+        fromMe: true,
+        desc: "Checks if the replied message is from a bot",
+        type: "info",
+    },
+    async (message) => {
+        if (!message.reply_message) {
+            return await message.reply("❌ Please reply to a message to check if it's from a bot.");
+        }
+
+        const messageId = message.reply_message.id;
+
+        if (messageId.startsWith("3EB")) {
+            return await message.reply("true.");
+        } else {
+            return await message.reply("false.");
+        }
+    }
+);
