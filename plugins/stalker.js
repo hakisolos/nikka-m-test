@@ -59,3 +59,54 @@ command(
     }
   }
 );
+command(
+    {
+        pattern: "ttstalk",
+        desc: "TikTok Stalker",
+        fromMe: true,
+        type: "stalker",
+    },
+    async (message, match) => {
+        try {
+            await message.react("⏳️");
+            const query = match?.trim();
+            const name = message.pushName;
+
+            if (!query) {
+                return await message.send(`Hello ${name}, please provide a TikTok username.`);
+            }
+
+            const apiUrl = `https://apii.ambalzz.biz.id/api/stalker/ttstalk?username=${encodeURIComponent(query)}`;
+            const resp = await getJson(apiUrl);
+
+            if (!resp?.status || resp.status !== "success" || !resp?.data?.user || !resp?.data?.stats) {
+                return await message.send("Failed to fetch TikTok profile details.");
+            }
+
+            const user = resp.data.user;
+            const stats = resp.data.stats;
+
+            const img = user.avatarThumb;
+            const text = `
+*NIKKA MD TIKTOK STALKER*
+
+👤 *Username:* ${user.uniqueId}
+📛 *Nickname:* ${user.nickname}
+✅ *Verified:* ${user.verified ? "Yes" : "No"}
+🌎 *Region:* ${user.region}
+
+📊 *Stats:*
+👥 *Followers:* ${stats.followerCount}
+👤 *Following:* ${stats.followingCount}
+❤️ *Likes:* ${stats.heart}
+👫 *Friends:* ${stats.friendCount}
+🎥 *Videos:* ${stats.videoCount}
+`;
+
+            await message.client.sendMessage(message.jid, { image: { url: img }, caption: text });
+        } catch (error) {
+            await message.send("An error occurred while fetching TikTok profile details.");
+            console.error(error);
+        }
+    }
+);
