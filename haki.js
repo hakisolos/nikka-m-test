@@ -56,17 +56,21 @@ const { File } = require("megajs");
   } catch (error) {
     console.error(error);
   }
-})();
 
-fs.readdirSync("./lib/database/").forEach((plugin) => {
-  if (path.extname(plugin).toLowerCase() === ".js") {
-    require("./lib/database/" + plugin);
+  fs.readdirSync("./lib/database/").forEach((plugin) => {
+    if (path.extname(plugin).toLowerCase() === ".js") {
+      require("./lib/database/" + plugin);
+    }
+  });
+
+  console.log("initializing database");
+
+  try {
+    await initializeStore();
+  } catch (error) {
+    console.error("Failed to initialize store:", error);
   }
-});
-console.log("initializing database")
-initializeStore()
-
-
+})();
 async function startNikka() {
   console.log("Syncing Database");
   await config.DATABASE.sync();
@@ -108,7 +112,7 @@ async function startNikka() {
     ) {
       if (conn?.state?.connection !== "open") {
         console.log(lastDisconnect.error.output.payload);
-        Abhiy();
+        startNikka();
       }
     }
 
@@ -265,7 +269,7 @@ conn.ev.on("group-participants.update", async (data) => {
 
   process.on("uncaughtException", async (err) => {
     //let error = err.message;
-    //console.log(err);
+    //console.log(err);*
     await conn.sendMessage(conn.user.id, { text: error });
   });
 }
