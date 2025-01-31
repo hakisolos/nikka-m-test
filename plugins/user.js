@@ -1,3 +1,4 @@
+const { getDevice } = require("@whiskeysockets/baileys");
 const {
   command,
   isPrivate,
@@ -786,3 +787,45 @@ command({
         await message.reply('❌ Failed to send the audio with uptime.');
     }
 });
+command(
+  {
+    pattern: "getDevice",
+    desc: "Check the device type of a message sender",
+    type: "tools",
+    fromMe: true,
+  },
+  async (message) => {
+    if (!message.reply_message) {
+      return await message.send("Please reply to a message to check the device type.");
+    }
+
+    try {
+      // Extract the device type
+      const device = getDevice(message.reply_message.key.id);
+
+      // Determine the device type
+      let deviceType = "";
+      switch (device) {
+        case "android":
+          deviceType = "Android";
+          break;
+        case "ios":
+          deviceType = "iOS";
+          break;
+        case "web":
+        case "Unknown": // Handle "Unknown" as WhatsApp Web
+          deviceType = "WhatsApp Web";
+          break;
+        default:
+          deviceType = "Unknown Device";
+          break;
+      }
+
+      // Send the device type
+      return await message.send(deviceType);
+    } catch (error) {
+      console.error(error);
+      return await message.send("An error occurred while determining the device type.");
+    }
+  }
+);
