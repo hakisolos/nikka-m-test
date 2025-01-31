@@ -10,6 +10,7 @@ const { serialize } = require("./lib/serialize");
 const { Message } = require("./lib/Base");
 const pino = require("pino");
 const path = require("path");
+const { initializeStore } = require('./DB/sql_init');
 const events = require("./lib/event");
 const got = require("got");
 const config = require("./config");
@@ -62,8 +63,11 @@ fs.readdirSync("./lib/database/").forEach((plugin) => {
     require("./lib/database/" + plugin);
   }
 });
+console.log("initializing database")
+await initializeStore()
 
-async function Abhiy() {
+
+async function startNikka() {
   console.log("Syncing Database");
   await config.DATABASE.sync();
 
@@ -268,5 +272,5 @@ conn.ev.on("group-participants.update", async (data) => {
 
 
 setTimeout(() => {
-  Abhiy();
+  startNikka();
 }, 3000);
