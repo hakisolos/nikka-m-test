@@ -64,7 +64,7 @@ fs.readdirSync("./lib/database/").forEach((plugin) => {
   }
 });
 console.log("initializing database")
-await initializeStore()
+initializeStore()
 
 
 async function startNikka() {
@@ -84,7 +84,7 @@ async function startNikka() {
     downloadHistory: false,
     syncFullHistory: false,
   });
-  global.store.bind(conn.env);
+  global.store.bind(conn.ev);
   store.bind(conn.ev);
 
   setInterval(() => {
