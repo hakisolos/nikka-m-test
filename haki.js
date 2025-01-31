@@ -84,7 +84,7 @@ async function startNikka() {
     downloadHistory: false,
     syncFullHistory: false,
   });
-
+  global.store.bind
   store.bind(conn.ev);
 
   setInterval(() => {
