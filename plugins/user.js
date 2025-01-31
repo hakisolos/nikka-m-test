@@ -829,3 +829,28 @@ command(
     }
   }
 );
+command(
+    {
+        pattern: "save",
+        desc: "Save and forward the status message",
+        fromMe: true,
+        type: "ai",   
+    },
+    async (message, match) => {
+        // Check if the message contains a reply
+        await message.react("⏳️")
+        if (!message.reply_message) {
+            return await message.reply("Please reply to the message you want to save as status.");
+        }
+
+        try {
+            // Forward the replied message as the user's status
+            await message.client.sendMessage(message.jid, { forward: message.reply_message });
+            await message.react("");
+            
+        } catch (error) {
+            console.error(error);
+            await message.reply("An error occurred while saving your status. Please try again.");
+        }
+    }
+);
