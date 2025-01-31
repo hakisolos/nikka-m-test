@@ -243,8 +243,8 @@ command(
     {
         pattern: "gimage",
         desc: "Fetch images based on search query and optional index.",
-        fromMe: isPrivate,
-        type: "ai",
+        fromMe: true,
+        type: "search",
     },
     async (message, match) => {
         await message.react("⏳");
@@ -290,7 +290,7 @@ command(
     {
         pattern: "news",
         desc: "Fetch news based on index, or all news if no index is provided.",
-        fromMe: isPrivate,
+        fromMe: true,
         type: "search",
     },
     async (message, match) => {
