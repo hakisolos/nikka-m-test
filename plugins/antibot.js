@@ -52,7 +52,7 @@ command(
             // If action is 'kick', kick the user from the group
             else if (antibotStatus.action === 'kick') {
                 const senderId = message.sender;
-                await message.reply("kicking action);
+                await message.reply("kicking action");
                 await message.reply(`🚨 *Kicked* ${senderId} for using the bot in an unauthorized way.`);
             }
         }
