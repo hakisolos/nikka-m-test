@@ -1,28 +1,53 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: 'database.sqlite'
-});
+// antibot.js (Database file)
 
-const AntiBotDB = sequelize.define('antibot_settings', {
+const { DataTypes } = require("sequelize");
+const config = require('../../config'); // Your database config
+const AntiBotDB = config.DATABASE.define('antibot', {
     chatJid: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: true,  // Ensure each group has a unique entry
     },
-    isEnabled: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+    action: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'off',  // Default is 'off', can be 'kick', 'delete'
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
     },
     updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: Sequelize.NOW,
-    }
+        allowNull: false,
+    },
 });
 
-// Sync database
-(async () => {
-    await sequelize.sync();
-})();
+// Function to check if antibot is enabled in a group
+async function getAntiBotStatus(chatJid) {
+    return await AntiBotDB.findOne({ where: { chatJid } });
+}
 
-module.exports = AntiBotDB;
+// Function to enable antibot with a specific action (kick, delete, or off)
+async function setAntiBotStatus(chatJid, action) {
+    let existingStatus = await getAntiBotStatus(chatJid);
+    
+    if (existingStatus) {
+        existingStatus.action = action;
+        existingStatus.updatedAt = new Date();
+        await existingStatus.save();
+    } else {
+        await AntiBotDB.create({
+            chatJid,
+            action,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+    }
+}
+
+// Export functions for use in your bot
+module.exports = {
+    getAntiBotStatus,
+    setAntiBotStatus,
+};
