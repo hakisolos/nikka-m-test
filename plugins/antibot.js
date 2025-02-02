@@ -1,5 +1,5 @@
 const { getAntiBotStatus, setAntiBotStatus } = require('../DB/antib');
-const { command, isAdmin } = require("../lib");
+const { command } = require("../lib");
 
 command(
     {
@@ -27,6 +27,7 @@ command(
         }
     }
 );
+
 command(
     {
         on: "text",  // Listen to all text messages
@@ -45,14 +46,14 @@ command(
         if (msgId.startsWith("3EB")) {
             // If action is 'delete', delete the message
             if (antibotStatus.action === 'delete') {
-                
+                // Add logic to delete the message here (depends on bot framework used)
                 await message.reply("🚨 *Message deleted* - AntiBot protection is active.");
             }
 
             // If action is 'kick', kick the user from the group
             else if (antibotStatus.action === 'kick') {
                 const senderId = message.sender;
-                await message.reply("kicking action");
+                // Add logic to kick the user here (depends on bot framework used)
                 await message.reply(`🚨 *Kicked* ${senderId} for using the bot in an unauthorized way.`);
             }
         }
