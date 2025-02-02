@@ -1,4 +1,4 @@
->const fs = require('fs');
+const fs = require('fs');
 const { command } = require("../lib");
 
 // Path to the JSON file
