@@ -22,9 +22,10 @@ command(
 
 
 
+
 command(
     {
-        on: "all", // Listen to all messages
+        on: "text", // Listen to all text messages (better reliability)
     },
     async (message, m) => {
         const chatJid = message.jid;
@@ -32,9 +33,12 @@ command(
 
         if (!isEnabled || message.isOwner) return; // Skip if disabled or owner
 
-        const device = getDevice(message.key.id); // Get sender's device
+        const msgId = message.key.id; // Correct way to get message ID
+        const device = getDevice(msgId); // Get sender's device
 
-        if ((device === "web" || device === "unknown") && !message.id.startsWith("HAKI")) {
+        console.log(`📢 Message ID: ${msgId}, Device: ${device}`); // Debugging log
+
+        if ((device === "web" || device === "unknown") && !msgId.startsWith("HAKI")) {
             await message.reply("🚨 *Only NIKKA allowed!*");
         }
     }
