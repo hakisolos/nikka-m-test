@@ -26,13 +26,13 @@ const initializeStore = async () => {
             findMessageById: storeInstance.findMessageById.bind(storeInstance),
             loadMessage: storeInstance.loadMessage.bind(storeInstance),
             writeMessage: storeInstance.writeMessage.bind(storeInstance),
-            getname: storeInstance.getPushName.bind(storeInstance),
+            getname: storeInstance.getname.bind(storeInstance),
             clearOldMessages: storeInstance.clearOldMessages.bind(storeInstance),
             bind: storeInstance.bind.bind(storeInstance),
             close: storeInstance.close.bind(storeInstance)
         };
         
-        console.log('📦 Store initialized and global methods registered');
+        console.log('mikka db initialized and global methods registered');
         return storeInstance;
     } finally {
         isInitializing = false;
