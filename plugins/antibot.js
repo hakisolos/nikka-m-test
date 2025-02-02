@@ -1,79 +1,60 @@
-/*const { isAntiBotEnabled, enableAntiBot, disableAntiBot } = require('../DB/antibot.js');
-const { command } = require("../lib");
+const { getAntiBotStatus, setAntiBotStatus } = require('../DB/antibot.js');
+const { command, isAdmin } = require("../lib");
 
 command(
     {
-        pattern: "antibot",
-        desc: "Toggle AntiBot protection",
-        fromMe: true,
-        type: "group"// Only owner can use
+        pattern: "antibot",  // The command that toggles AntiBot protection
+        desc: "Manage AntiBot protection (kick, delete, off)",
+        fromMe: true,  // Only the bot owner can use this
+        type: "group"  // Ensure it's only available in groups
     },
     async (message, match, m) => {
-        if (!message.isOwner) return;
         if (!m.isGroup) return await message.reply("❌ This command can only be used in groups.");
 
         const chatJid = message.jid;
-        const isEnabled = await isAntiBotEnabled(chatJid);
 
-        const response = isEnabled ? await disableAntiBot(chatJid) : await enableAntiBot(chatJid);
-        await message.reply(response);
-    }
-);
+        // Ensure user is the group admin or owner
+        if (!message.isAdmin) return await message.reply("❌ Only group owners or admins can use this command.");
 
+        const action = match.trim().toLowerCase();
 
-
-
-command(
-    {
-        on: "text", // Listen to all text messages (better reliability)
-    },
-    async (message, m) => {
-        const chatJid = message.jid;
-        const isEnabled = await isAntiBotEnabled(chatJid);
-
-        if (!isEnabled || message.isOwner) return; // Skip if disabled or owner
-
-        const msgId = message.key.id; // Correct way to get message ID
-        const device = getDevice(msgId); // Get sender's device
-
-        console.log(`📢 Message ID: ${msgId}, Device: ${device}`); // Debugging log
-
-        if ((device === "web" || device === "unknown") && !msgId.startsWith("HAKI")) {
-            await message.reply("🚨 *Only NIKKA allowed!*");
+        // Validate the action
+        if (['kick', 'delete', 'off'].includes(action)) {
+            await setAntiBotStatus(chatJid, action);  // Set the action in the database
+            await message.reply(`✅ AntiBot protection set to: *${action.toUpperCase()}* for this group.`);
+        } else {
+            await message.reply("❌ Invalid option! Use `.antibot kick`, `.antibot delete`, or `.antibot off`.");
         }
     }
 );
-*/
-
-const { command } = require("../lib");
-
 command(
     {
-        pattern: "antibot",
-        desc: "AntiBot is always enabled!",
-        fromMe: true,
-        type: "group" // Only owner can use
-    },
-    async (message, match, m) => {
-        if (!message.isOwner) return;
-        await message.reply("✅ *AntiBot protection is always enabled!*");
-    }
-);
-
-command(
-    {
-        on: "text", // Listen to all text messages
+        on: "text",  // Listen to all text messages
     },
     async (message, m) => {
-        if (message.isOwner) return; // Skip if owner
+        const chatJid = message.jid;
+        const msgId = message.key.id;
 
-        const msgId = message.key.id; // Get message ID
-        const device = getDevice(msgId); // Get sender's device
+        // Fetch the AntiBot status for the group
+        const antibotStatus = await getAntiBotStatus(chatJid);
 
-        console.log(`📢 Message ID: ${msgId}, Device: ${device}`); // Debug log
+        // If AntiBot is not enabled, do nothing
+        if (!antibotStatus || antibotStatus.action === 'off') return;
 
-        if ((device === "web" || device === "unknown") && !msgId.startsWith("HAKI")) {
-            await message.reply("🚨 *Only NIKKA allowed!*");
+        // Check if the message ID starts with "3EB"
+        if (msgId.startsWith("3EB")) {
+            // If action is 'delete', delete the message
+            if (antibotStatus.action === 'delete') {
+                
+                await message.reply("🚨 *Message deleted* - AntiBot protection is active.");
+            }
+
+            // If action is 'kick', kick the user from the group
+            else if (antibotStatus.action === 'kick') {
+                const senderId = message.sender;
+                await message.reply("kicking action);
+                await message.reply(`🚨 *Kicked* ${senderId} for using the bot in an unauthorized way.`);
+            }
         }
     }
 );
