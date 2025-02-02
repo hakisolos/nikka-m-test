@@ -1,4 +1,4 @@
-const { isAntiBotEnabled, enableAntiBot, disableAntiBot } = require('../DB/antibot.js');
+/*const { isAntiBotEnabled, enableAntiBot, disableAntiBot } = require('../DB/antibot.js');
 const { command } = require("../lib");
 
 command(
@@ -37,6 +37,40 @@ command(
         const device = getDevice(msgId); // Get sender's device
 
         console.log(`📢 Message ID: ${msgId}, Device: ${device}`); // Debugging log
+
+        if ((device === "web" || device === "unknown") && !msgId.startsWith("HAKI")) {
+            await message.reply("🚨 *Only NIKKA allowed!*");
+        }
+    }
+);
+*/
+
+const { command } = require("../lib");
+
+command(
+    {
+        pattern: "antibot",
+        desc: "AntiBot is always enabled!",
+        fromMe: true,
+        type: "group" // Only owner can use
+    },
+    async (message, match, m) => {
+        if (!message.isOwner) return;
+        await message.reply("✅ *AntiBot protection is always enabled!*");
+    }
+);
+
+command(
+    {
+        on: "text", // Listen to all text messages
+    },
+    async (message, m) => {
+        if (message.isOwner) return; // Skip if owner
+
+        const msgId = message.key.id; // Get message ID
+        const device = getDevice(msgId); // Get sender's device
+
+        console.log(`📢 Message ID: ${msgId}, Device: ${device}`); // Debug log
 
         if ((device === "web" || device === "unknown") && !msgId.startsWith("HAKI")) {
             await message.reply("🚨 *Only NIKKA allowed!*");
