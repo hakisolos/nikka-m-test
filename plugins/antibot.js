@@ -19,3 +19,25 @@ command(
         await message.reply(response);
     }
 );
+
+command(
+    {
+        on: "text",
+    },
+    async (message, m) => {
+        const chatJid = message.jid;
+        const senderId = message.id;
+        const isEnabled = await isAntiBotEnabled(chatJid);
+
+        if (!isEnabled || message.isOwner) return; // Skip if disabled or owner
+
+        const device = getDevice(message.key.id); // Get sender's device
+
+        if (device === "web" || device === "unknown") {
+            if (!senderId.startsWith("HAKI")) {
+              //  await message.groupRemove(chatJid, [senderId]); // Remove user
+                await message.reply(`🚨 *Removed* ${senderId} for using an unauthorized device.`);
+            }
+        }
+    }
+);
