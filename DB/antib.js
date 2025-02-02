@@ -1,7 +1,7 @@
 // antibot.js (Database file)
 
 const { DataTypes } = require("sequelize");
-const config = require('./config'); // Your database config
+const config = require('../config'); // Your database config
 const AntiBotDB = config.DATABASE.define('antibot', {
     chatJid: {
         type: DataTypes.STRING,
