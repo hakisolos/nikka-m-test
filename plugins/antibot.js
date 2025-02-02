@@ -1,5 +1,5 @@
 const { isAntiBotEnabled, enableAntiBot, disableAntiBot } = require('../DB/antibot.js');
-
+const { command } = require("../lib");
 command(
     {
         pattern: "antibot",
