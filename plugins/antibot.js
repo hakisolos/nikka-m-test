@@ -1,4 +1,4 @@
-const { isAntiBotEnabled, enableAntiBot, disableAntiBot } = require('../DB/antibot.js);
+const { isAntiBotEnabled, enableAntiBot, disableAntiBot } = require('../DB/antibot.js');
 
 command(
     {
