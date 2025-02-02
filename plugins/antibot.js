@@ -14,7 +14,7 @@ command(
         const chatJid = message.jid;
 
         // Ensure user is the group admin or owner
-        if (!message.isAdmin) return await message.reply("❌ Only group owners or admins can use this command.");
+        if (isAdmin) return await message.reply("❌ Only group owners or admins can use this command.");
 
         const action = match.trim().toLowerCase();
 
