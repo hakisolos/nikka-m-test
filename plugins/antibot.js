@@ -1,4 +1,4 @@
-const { getAntiBotStatus, setAntiBotStatus } = require('../DB/antibotdb');
+const { getAntiBotStatus, setAntiBotStatus } = require('../DB/antib');
 const { command, isAdmin } = require("../lib");
 
 command(
