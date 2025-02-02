@@ -1,27 +1,48 @@
-const { getAntiBotStatus, setAntiBotStatus } = require('../DB/antib');
+>const fs = require('fs');
 const { command } = require("../lib");
+
+// Path to the JSON file
+const jsonFilePath = './DB/antibotStatus.json';
+
+// Helper function to check if the JSON file exists, and if not, create it
+const createJSONFileIfNotExists = () => {
+    if (!fs.existsSync(jsonFilePath)) {
+        // If the file does not exist, create a new one with an empty object
+        fs.writeFileSync(jsonFilePath, JSON.stringify({}, null, 2));
+    }
+};
+
+// Helper function to get AntiBot status from the JSON file
+const getAntiBotStatus = (chatJid) => {
+    createJSONFileIfNotExists();
+    const data = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+    return data[chatJid] || null;
+};
+
+// Helper function to set AntiBot status in the JSON file
+const setAntiBotStatus = (chatJid, action) => {
+    createJSONFileIfNotExists();
+    const data = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+    data[chatJid] = { action: action };
+    fs.writeFileSync(jsonFilePath, JSON.stringify(data, null, 2));
+};
 
 command(
     {
-        pattern: "antibot",  // The command that toggles AntiBot protection
+        pattern: "antibot",
         desc: "Manage AntiBot protection (kick, delete, off)",
-        fromMe: true,  // Only the bot owner can use this
-        type: "group"  // Ensure it's only available in groups
+        fromMe: true,
+        type: "group"
     },
     async (message, match, m) => {
-        if (!m.isGroup) return await message.reply("❌ This command can only be used in groups.");
+        if (!m.isGroup) return await message.reply("❌ ɢʀᴏᴜᴘ ᴏɴʟʏ");
 
         const chatJid = message.jid;
-
-        // Ensure user is the group admin or owner
-        if (!isAdmin) return await message.reply("❌ Only group owners or admins can use this command.");
-
         const action = match.trim().toLowerCase();
 
-        // Validate the action
         if (['kick', 'delete', 'off'].includes(action)) {
-            await setAntiBotStatus(chatJid, action);  // Set the action in the database
-            await message.reply(`✅ AntiBot protection set to: *${action.toUpperCase()}* for this group.`);
+            await setAntiBotStatus(chatJid, action);
+            await message.reply(`✅ ᴀɴᴛɪʙᴏᴛ ғᴏʀ ᴄᴜʀʀᴇɴᴛ ɢʀᴏᴜᴘ sᴇᴛ ᴛᴏ  *${action.toUpperCase()}`);
         } else {
             await message.reply("❌ Invalid option! Use `.antibot kick`, `.antibot delete`, or `.antibot off`.");
         }
@@ -30,31 +51,24 @@ command(
 
 command(
     {
-        on: "text",  // Listen to all text messages
+        on: "text",
     },
     async (message, m) => {
         const chatJid = message.jid;
         const msgId = message.key.id;
 
-        // Fetch the AntiBot status for the group
         const antibotStatus = await getAntiBotStatus(chatJid);
 
-        // If AntiBot is not enabled, do nothing
         if (!antibotStatus || antibotStatus.action === 'off') return;
 
-        // Check if the message ID starts with "3EB"
         if (msgId.startsWith("3EB")) {
-            // If action is 'delete', delete the message
             if (antibotStatus.action === 'delete') {
-                // Add logic to delete the message here (depends on bot framework used)
-                await message.reply("🚨 *Message deleted* - AntiBot protection is active.");
-            }
-
-            // If action is 'kick', kick the user from the group
-            else if (antibotStatus.action === 'kick') {
-                const senderId = message.sender;
-                // Add logic to kick the user here (depends on bot framework used)
-                await message.reply(`🚨 *Kicked* ${senderId} for using the bot in an unauthorized way.`);
+                await message.reply("🚨 ᴀɴᴛɪʙᴏᴛ ᴅᴇᴛᴇᴄᴛᴇᴅ !, ᴍᴇssᴀɢᴇ ᴅᴇʟᴇᴛᴇᴅ.");
+                await message.client.sendMessage(message.jid, { delete: message.key });
+            } else if (antibotStatus.action === 'kick') {
+                const user = m.sender;
+                await message.reply(`🚨 *ᴀɴᴛɪʙᴏᴛ ᴅᴇᴛᴇᴄᴛᴇᴅ* ${user} ᴋɪᴄᴋᴇᴅ.`);
+                await message.client.groupParticipantsUpdate(message.jid, [user], "remove");
             }
         }
     }
