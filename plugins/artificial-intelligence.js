@@ -133,3 +133,30 @@ command(
         }
     }
 );
+
+command(
+    {
+        pattern: "dalle",
+        desc: "Generates an image using DALL·E AI",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match) => {
+        const prompt = match.trim();
+        if (!prompt) {
+            await message.react("❌️");
+            return await message.reply(`Hello ${message.pushName}, please provide a prompt for the image.`);
+        }
+
+        try {
+            await message.react("⏳️");
+            const apiUrl = `https://bk9.fun/ai/magicstudio?prompt=${encodeURIComponent(prompt)}`;
+            await message.sendFromUrl(apiUrl);
+            await message.react("");
+        } catch (error) {
+            await message.react("❌️");
+            await message.reply("An error occurred while generating the image. Please try again later.");
+            console.error(error);
+        }
+    }
+);
