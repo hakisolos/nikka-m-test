@@ -99,3 +99,37 @@ command(
         }
     }
 );
+command(
+    {
+        pattern: "llama",
+        desc: "Gets response from Llama AI",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match, m) => {
+        const query = match.trim();
+        if (!query) {
+            await message.react("❌️");
+            return await m.reply(`Hello ${message.pushName}, how can I help you?`);
+        }
+        
+        try {
+            await message.react("⏳️");
+            const msg = await message.client.sendMessage(message.jid, { text: "Thinking..." });
+            const apiUrl = `https://bk9.fun/ai/llama?q=${encodeURIComponent(query)}`;
+            const res = await getJson(apiUrl);
+
+            if (!res || !res.BK9) {
+                throw new Error("Invalid response from API");
+            }
+
+            const ai = res.BK9;
+            await message.fek(msg.key, ai);
+            await message.react("");
+        } catch (error) {
+            await message.react("❌️");
+            await message.reply("An error occurred while processing your request. Please try again later.");
+            console.error(error);
+        }
+    }
+);
