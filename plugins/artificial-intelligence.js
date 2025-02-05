@@ -195,3 +195,38 @@ command(
         }
     }
 );
+command(
+    {
+        pattern: "claude",
+        desc: "Gets response from Claude Opus",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match, m) => {
+        const query = match.trim();
+        if (!query) {
+            await message.react("❌️");
+            return await message.reply(`Hello ${message.pushName}, how can I help you?`);
+        }
+        
+        try {
+            await message.react("⏳️");
+            const msg = await message.client.sendMessage(message.jid, { text: "Thinking..." });
+            const userId = m.sender.split('@')[0]; 
+            const apiUrl = `https://bk9.fun/ai/Claude-Opus?q=${encodeURIComponent(query)}&userId=${userId}`;
+            const res = await getJson(apiUrl);
+
+            if (!res || !res.BK9) {
+                throw new Error("Invalid response from API");
+            }
+
+            const ai = res.BK9;
+            await message.fek(msg.key, ai);
+            await message.react("");
+        } catch (error) {
+            await message.react("❌️");
+            await message.reply("An error occurred while processing your request. Please try again later.");
+            console.error(error);
+        }
+    }
+);
