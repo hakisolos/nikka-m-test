@@ -30,3 +30,38 @@ command(
         }
     }
 );
+
+command(
+    {
+        pattern: "gemini",
+        desc: "Gets response from Gemini AI",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match, m) => {
+        const query = match.trim();
+        if (!query) {
+            await message.react("❌️");
+            return await m.reply(`Hello ${message.pushName}, how can I help you?`);
+        }
+        
+        try {
+            await message.react("⏳️");
+            const msg = await message.client.sendMessage(message.jid, { text: "Thinking..." });
+            const apiUrl = `https://nikka-api.us.kg/ai/gemini?q=${encodeURIComponent(query)}&apiKey=nikka`;
+            const res = await getJson(apiUrl);
+
+            if (!res || !res.response) {
+                throw new Error("Invalid response from API");
+            }
+
+            const ai = res.response;
+            await message.fek(msg.key, ai)
+            await message.react("");
+        } catch (error) {
+            await message.react("❌️");
+            await message.reply("An error occurred while processing your request. Please try again later.");
+            console.error(error);
+        }
+    }
+);
