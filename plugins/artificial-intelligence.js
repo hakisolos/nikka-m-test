@@ -265,3 +265,37 @@ command(
         }
     }
 );
+command(
+    {
+        pattern: "nikka",
+        desc: "Gets response from Chat AI Bot",
+        fromMe: isPrivate,
+        type: "ai",
+    },
+    async (message, match, m) => {
+        const query = match || message.reply_message.text
+        if (!query) {
+            await message.react("❌️");
+            return await message.reply(`Hello ${message.pushName}, how can I help you?`);
+        }
+        
+        try {
+            await message.react("⏳️");
+            const msg = await message.client.sendMessage(message.jid, { text: "Thinking..." });
+            const apiUrl = `https://bk9.fun/ai/chataibot?q=${encodeURIComponent(query)}`;
+            const res = await getJson(apiUrl);
+
+            if (!res || !res.BK9) {
+                throw new Error("Invalid response from API");
+            }
+
+            const ai = res.BK9;
+            await message.fek(msg.key, ai);
+            await message.react("");
+        } catch (error) {
+            await message.react("❌️");
+            await message.reply("An error occurred while processing your request. Please try again later.");
+            console.error(error);
+        }
+    }
+);
