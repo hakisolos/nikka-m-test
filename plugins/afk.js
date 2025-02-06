@@ -64,7 +64,7 @@ command(
     } else {
       if (m.sender === message.user) return;
       const now = Date.now();
-      if (now - (afkTrack[m..sender] || 0) < 30000) return;
+      if (now - (afkTrack[m.sender] || 0) < 30000) return;
       afkTrack[m.sender] = now;
       return await message.reply(
         `${afkData.message}\n\nLast Seen: ${formatDuration(now - afkData.timestamp)}`
