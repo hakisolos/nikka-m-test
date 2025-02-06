@@ -12,6 +12,7 @@ command(
   },
   async (message, m, match) => {
     const prefix = message.prefix || '.'; // Adjust prefix logic if needed
+    match = match ? String(match).trim() : ''; // Ensure match is always a string
 
     if (!match) {
       return await message.reply(`${prefix}afk on\n${prefix}afk set <message>\n${prefix}afk off`);
@@ -62,10 +63,10 @@ command(
         );
       }
     } else {
-      if (m.sender === message.user) return;
+      if (message.sender === message.user) return;
       const now = Date.now();
-      if (now - (afkTrack[m.sender] || 0) < 30000) return;
-      afkTrack[m.sender] = now;
+      if (now - (afkTrack[message.sender] || 0) < 30000) return;
+      afkTrack[message.sender] = now;
       return await message.reply(
         `${afkData.message}\n\nLast Seen: ${formatDuration(now - afkData.timestamp)}`
       );
