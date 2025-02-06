@@ -12,30 +12,33 @@ command(
   },
   async (message, m, match) => {
     const prefix = message.prefix || '.'; // Adjust prefix logic if needed
-    match = match ? String(match).trim() : ''; // Ensure match is always a string
+    let args = message.text.split(' ').slice(1).join(' ').trim(); // Extract arguments manually
 
-    if (!match) {
+    console.log("Received match:", match);
+    console.log("Extracted args:", args);
+
+    if (!args) {
       return await message.reply(`${prefix}afk on\n${prefix}afk set <message>\n${prefix}afk off`);
     }
 
-    if (match === 'on') {
+    if (args === 'on') {
       await setAfkMessage(`I'm currently away, please leave a message.`, Date.now());
       return await message.reply(`AFK is now active. Customize with ${prefix}afk set <message>.`);
     }
 
-    if (match === 'off') {
+    if (args === 'off') {
       await delAfkMessage();
       return await message.reply('AFK has been deactivated.');
     }
 
-    if (match.startsWith('set')) {
-      const afkMessage = match.split(' ').slice(1).join(' ');
+    if (args.startsWith('set')) {
+      const afkMessage = args.split(' ').slice(1).join(' ');
       if (!afkMessage) return await message.reply('Provide a message to set as AFK status.');
       await setAfkMessage(afkMessage, Date.now());
       return await message.reply(`AFK message set to: "${afkMessage}"`);
     }
 
-    if (match === 'get') {
+    if (args === 'get') {
       const afkData = await getAfkMessage();
       if (!afkData) return await message.reply('No AFK message set. Use .afk set <message>.');
       return await message.reply(
@@ -63,10 +66,10 @@ command(
         );
       }
     } else {
-      if (message.sender === message.user) return;
+      if (m.sender === message.user) return;
       const now = Date.now();
-      if (now - (afkTrack[message.sender] || 0) < 30000) return;
-      afkTrack[message.sender] = now;
+      if (now - (afkTrack[m.sender] || 0) < 30000) return;
+      afkTrack[m.sender] = now;
       return await message.reply(
         `${afkData.message}\n\nLast Seen: ${formatDuration(now - afkData.timestamp)}`
       );
