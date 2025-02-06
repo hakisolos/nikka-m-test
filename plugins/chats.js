@@ -1,10 +1,10 @@
 const { getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } = require('../DB/store');
-const { command } = require('../lib');
+const { command,  isPrivate } = require('../lib');
 
 command(
   {
     pattern: 'listpc',
-    public: false,
+    fromMe: isPrivate,
     desc: 'Get direct messages summary',
     type: 'user',
   },
@@ -39,7 +39,7 @@ Last Message: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`
 command(
   {
     pattern: 'listgc',
-    public: false,
+    fromMe: isPrivate,
     desc: 'Get group chats summary',
     type: 'user',
   },
@@ -70,11 +70,10 @@ Last Message: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
   }
 );
 
-bot(
+command(
   {
     pattern: 'active',
-    public: true,
-    isGroup: true,
+    fromMe: isPrivate,
     desc: 'Return the Active Group Members from when the bot started running',
     type: 'group',
   },
@@ -94,8 +93,7 @@ bot(
 command(
   {
     pattern: 'inactive',
-    public: true,
-    isGroup: true,
+    fromMe: isPrivate,
     desc: 'Get the inactive group members from a group',
     type: 'group',
   },
