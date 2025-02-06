@@ -1,34 +1,40 @@
 const fs = require('fs');
 const path = require('path');
 
-const store = path.join('store', 'afk.json');
+const storeDir = path.join(__dirname, 'store'); // Ensure absolute path
+const storeFile = path.join(storeDir, 'afk.json'); // Full path to afk.json
+
+// Ensure the 'store' directory and 'afk.json' exist
+function ensureFileExists() {
+  try {
+    if (!fs.existsSync(storeDir)) {
+      fs.mkdirSync(storeDir, { recursive: true }); // Create 'store' directory
+    }
+
+    if (!fs.existsSync(storeFile)) {
+      fs.writeFileSync(storeFile, JSON.stringify({ message: null, timestamp: null }, null, 2));
+    }
+  } catch (error) {
+    console.error("Error ensuring afk.json exists:", error);
+  }
+}
 
 async function getAfkMessage() {
-  if (!fs.existsSync(store)) {
-    fs.writeFileSync(store, JSON.stringify({ message: null, timestamp: null }));
-  }
-  const data = JSON.parse(fs.readFileSync(store, 'utf8'));
-  if (data.message && data.timestamp) {
-    return { message: data.message, timestamp: data.timestamp };
-  }
-  return null;
+  ensureFileExists();
+  const data = JSON.parse(fs.readFileSync(storeFile, 'utf8'));
+  return data.message && data.timestamp ? data : null;
 }
 
 const setAfkMessage = async (afkMessage, timestamp) => {
-  if (!fs.existsSync(store)) {
-    fs.writeFileSync(store, JSON.stringify({ message: null, timestamp: null }));
-  }
+  ensureFileExists();
   const data = { message: afkMessage, timestamp };
-  fs.writeFileSync(store, JSON.stringify(data, null, 2));
+  fs.writeFileSync(storeFile, JSON.stringify(data, null, 2));
   return data;
 };
 
 const delAfkMessage = async () => {
-  if (!fs.existsSync(store)) {
-    fs.writeFileSync(store, JSON.stringify({ message: null, timestamp: null }));
-  }
-  const data = { message: null, timestamp: null };
-  fs.writeFileSync(store, JSON.stringify(data, null, 2));
+  ensureFileExists();
+  fs.writeFileSync(storeFile, JSON.stringify({ message: null, timestamp: null }, null, 2));
 };
 
 module.exports = { getAfkMessage, setAfkMessage, delAfkMessage };
