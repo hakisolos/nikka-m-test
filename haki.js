@@ -10,13 +10,14 @@ const { serialize } = require("./lib/serialize");
 const { Message } = require("./lib/Base");
 const pino = require("pino");
 const path = require("path");
-const { initializeStore } = require('./DB/sql_init');
 const events = require("./lib/event");
 const got = require("got");
 const config = require("./config");
 const { PluginDB } = require("./lib/database/plugins");
 const Greetings = require("./lib/Greetings");
 const saveCreds = require("./lib/session");
+require('module-alias/register');
+
 
 const store = makeInMemoryStore({
   logger: pino().child({ level: "silent", stream: "store" }),
@@ -63,10 +64,9 @@ const { File } = require("megajs");
     }
   });
 
-  console.log("initializing database");
 
   try {
-    await initializeStore();
+
   } catch (error) {
     console.error("Failed to initialize store:", error);
   }
@@ -88,7 +88,7 @@ async function startNikka() {
     downloadHistory: false,
     syncFullHistory: false,
   });
-  global.store.bind(conn.ev);
+
   store.bind(conn.ev);
 
   setInterval(() => {
