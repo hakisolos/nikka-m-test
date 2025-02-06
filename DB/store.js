@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { isJidBroadcast, isJidGroup, isJidNewsletter } = require('baileys');
+const { isJidBroadcast, isJidGroup, isJidNewsletter } = require('haki-baileys');
 
 const storeDir = path.join(process.cwd(), 'store');
 
