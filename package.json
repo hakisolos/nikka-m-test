@@ -79,7 +79,7 @@
   },
   "_moduleAliases": {
     "@lib": "./lib",
-    "@func": "./lib/functions/index.js",
+    "@ai": "./lib/functions/index.js",
     "@config": "../config.js"
   }
 }
