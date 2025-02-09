@@ -1,0 +1,11 @@
+var rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+var ask = (text) => new Promise((resolve) => rl.question(text, resolve));
+
+if (!sock.authState.creds.registered) {
+		var ph = await ask("Enter Number: ");
+		var code = await sock.requestPairingCode(ph);
+		console.log(`CODE : ${code}`);
+	}
