@@ -6,7 +6,7 @@ command(
     pattern: "run",
     fromMe: true,
     desc: "Run terminal commands",
-    type: "utility",
+    type: "user",
   },
   async (message, match, m) => {
     // Ensure that there is a command to run
@@ -37,7 +37,7 @@ command(
         pattern: "isbot",
         fromMe: true,
         desc: "Checks if the replied message is from a bot",
-        type: "info",
+        type: "user",
     },
     async (message) => {
         if (!message.reply_message) {
