@@ -38,18 +38,13 @@ Description: ${i.desc}\`\`\``);
         let usern = message.pushName;
         const readMore = String.fromCharCode(8206).repeat(4001);
 
-        let menu = `\n╭━━━〔 𝞜𝞘𝞙𝞙𝞓 𝞛𝘿 〕━━━┈
-╚═════════════════✦═╝
-╔═════════════════✦═╗
-  🌻 𝗼𝘄𝗻𝗲𝗿: ${BOT_INFO.split(";")[1]}
-  🌻 𝘂𝘀𝗲𝗿: ${usern}
-  🌻 𝗱𝗮𝘁𝗲: ${date}
-  🌻 𝘁𝗶𝗺𝗲: ${time}
-  🌻 𝗰𝗺𝗱𝘀: ${plugins.commands.length}
-  🌻 𝗺𝗼𝗱𝗲: ${config.WORK_TYPE}
-  🌻 𝗽𝗿𝗲𝗳𝗶𝘅: ${config.HANDLERS}
-  🌻 𝘃𝗲𝗿𝘀𝗶𝗼𝗻: ${require("../package.json").version}
-╚═════════════════✦═╝${readMore}`;
+        let menu = `\n〔 𝞜𝞘𝞙𝞙𝞓 𝞛𝘿 〕
+╔═════════✦═╗
+  ׂꕥ 𝗼𝘄𝗻𝗲𝗿: ${BOT_INFO.split(";")[1]}
+  ׂꕥ 𝗰𝗺𝗱𝘀: ${plugins.commands.length}
+  ׂꕥ 𝗺𝗼𝗱𝗲: ${config.WORK_TYPE}
+  ׂꕥ 𝗽𝗿𝗲𝗳𝗶𝘅: ${config.HANDLERS}
+╚═════════✦═╝${readMore}`;
 
         let cmnd = [];
         let cmd;
@@ -84,9 +79,9 @@ Description: ${i.desc}\`\`\``);
 
         // Random menu images
         const menuImages = [
-          "https://cdn.ironman.my.id/i/fkswvj.jpg",
-          "https://cdn.ironman.my.id/i/ni2xjw.jpg",
-          "https://cdn.ironman.my.id/i/fkswvj.jpg",
+          "https://files.catbox.moe/mabris.jpg",
+          "https://files.catbox.moe/mabris.jpg",
+          "https://files.catbox.moe/mabris.jpg",
           config.BOT_INFO.split(";")[2], // Including the existing one
         ];
         const randomImage = menuImages[Math.floor(Math.random() * menuImages.length)];

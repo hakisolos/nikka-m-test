@@ -79,7 +79,8 @@
   },
   "_moduleAliases": {
     "@lib": "./lib",
-    "@ai": "./lib/functions/index.js",
+    "@ai": "./lib/functions/ai.js",
+    "@search": "./lib/functions/search.js",
     "@config": "../config.js"
   }
 }

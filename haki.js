@@ -147,12 +147,9 @@ async function startNikka() {
       const packageVersion = require("./package.json").version;
       const totalPlugins = events.commands.length;
       const workType = config.WORK_TYPE;
-      const statusMessage = `Nikka x md connected  ✅\nᴠᴇʀsɪᴏɴ: ${packageVersion}\n ᴄᴍᴅs: ${totalPlugins}\ᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n 𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
+      const statusMessage = `ׂ╰┈➤Nikka x md connected  ✅\n ׂ╰┈➤ᴠᴇʀsɪᴏɴ: ${packageVersion}\n ׂ╰┈➤ᴄᴍᴅs: ${totalPlugins}\n ׂ╰┈➤ᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n ׂ╰┈➤𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
 
-      await conn.sendMessage(conn.user.id, {
-        image: { url: "https://files.catbox.moe/mnp025.jpg" },
-        caption: `\`\`\`${statusMessage}\`\`\``,
-      });
+      await conn.sendMessage(conn.user.id, {text: statusMessage})
     }
 
     try {
@@ -233,6 +230,10 @@ conn.ev.on("group-participants.update", async (data) => {
   !config.SUDO.includes(msg.sender?.split("@")[0] || !msg.isSelf)
 )
             return;
+            var id = conn.user.id
+          if(id.startsWith("@newsletter")){
+            return;
+          }
 
           let comman;
           if (text_msg) {

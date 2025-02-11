@@ -7,77 +7,6 @@ const imageUrl = "https://files.catbox.moe/flinnf.jpg"; // Developer image
 const thumbnailUrl = "https://files.catbox.moe/cuu1aa.jpg"; // Thumbnail image
 
 // Search command to find songs based on the user's query
-command(
-  {
-    pattern: "song ?(.*)",
-    fromMe: false,
-    desc: "Search for songs using a keyword and download the first result",
-    type: "downloader",
-  },
-  async (message, match) => {
-    try {
-      const query = match.trim();
-      if (!query) return message.reply("Please provide a search query.\nExample: `.search Shape of You`");
-
-      const apiUrl = `${searchApi}${encodeURIComponent(query)}&apiKey=${apiKey}`;
-      const response = await getJson(apiUrl);
-
-      const results = response?.data || [];
-      if (results.length === 0) {
-        return message.reply("No results found for your query.");
-      }
-
-      // Automatically get the first result's videoId
-      const firstResult = results[0];
-      const videoId = firstResult.videoId;
-
-      // Send the search result with the image and thumbnail
-      let responseMessage = `*Search Results for "${query}":*\n\n`;
-      responseMessage += `1. *${firstResult.title}*\n   - Duration: ${firstResult.duration.timestamp}\n   - Views: ${firstResult.views.toLocaleString()} views\n   - By: ${firstResult.author.name}\n\n`;
-      responseMessage += "Downloading the first result...";
-
-      await message.client.sendMessage(message.jid, {
-        image: { url: imageUrl },
-        caption: responseMessage,
-        contextInfo: {
-          externalAdReply: {
-            title: `Search Result: ${firstResult.title}`,
-            body: "First Result",
-            sourceUrl: "https://haki.us.kg", // Link to your website
-            mediaUrl: "https://haki.us.kg", // Additional URL
-            mediaType: 4,
-            showAdAttribution: true,
-            renderLargerThumbnail: false,
-            thumbnailUrl: thumbnailUrl,
-          },
-        },
-      });
-
-      // Fetch the download URL for the first result
-      const downloadUrl = `${downloadApi}${videoId}`;
-      const downloadResponse = await getJson(downloadUrl);
-
-      // Check if the download response is valid
-      if (downloadResponse.status) {
-        const audioUrl = downloadResponse.data.dl;
-        const audioTitle = downloadResponse.data.title;
-
-        // Send the audio file to the user
-        await message.client.sendMessage(message.jid, {
-          audio: { url: audioUrl },
-          caption: `*${audioTitle}*`,
-          mimetype: "audio/mpeg",
-        });
-      } else {
-        return message.reply("Error downloading the song. Please try again.");
-      }
-    } catch (error) {
-      console.error(error);
-      return message.reply("An error occurred while searching or downloading. Please try again.");
-    }
-  }
-);
-
 
 
 
@@ -172,163 +101,7 @@ _Downloading the file. This may take some time._
         }
     }
 );
-command(
-    {
-        pattern: "rwfw",
-        desc: "Downloading media",
-        type: "downloader",
-        fromMe: isPrivate,
-    },
-    async (message, match) => {
-      const query = match.trim();
-        try {
-            if (!query) {
-                return await message.reply("Provide a media query.");
-            }
 
-            const response = await getJson(`https://api.giftedtech.my.id/api/search/yts?apikey=king_haki-k7gjd8@gifted_api&query=${query}`);
-            
-            // Check if results exist
-            if (!response || !response.results || response.results.length === 0) {
-                return await message.reply("No media found for the given query.");
-            }
-
-            const res = response.results[0];
-            
-            const responsedl = await getJson(`https://api.giftedtech.my.id/api/download/ytmp3?apikey=king_haki-k7gjd8@gifted_api&url=${res.url}`);
-
-            // Check if download URL exists
-            if (!responsedl || !responsedl.result) {
-                return await message.reply("Failed to retrieve download URL.");
-            }
-
-            const resdl = responsedl.result; // Corrected this line
-
-            const text = `
-Nikka MD Media Downloader
-
-*Name*: ${res.title}
-*Description*: ${res.description}
-*URL*: ${res.url}
-            `;
-
-            // Send the image with the text as a caption
-            await message.client.sendMessage(message.jid, {
-                image: { url: res.image }, // Image URL from API response
-                caption: text, // Text as caption
-            });
-            
-            // Send the audio with the caption
-            await message.client.sendMessage(message.jid, {
-                audio: { url: `${resdl.download_url}` }, // Directly using resdl
-                caption: `*${res.title}*`,
-                mimetype: "audio/mpeg",
-            });
-        } catch (error) {
-            console.error(error);
-            await message.reply("if your seeing this error, jusr redo the command it will work");
-        }
-    }
-);
-command(
-    {
-        pattern: "vid",
-        desc: "Downloading media",
-        type: "downloader",
-        fromMe: isPrivate,
-    },
-    async (message, match) => {
-      const query = match.trim();
-        try {
-            if (!query) {
-                return await message.reply("Provide a media query.");
-            }
-
-            const response = await getJson(`https://api.giftedtech.my.id/api/search/yts?apikey=king_haki-k7gjd8@gifted_api&query=${query}`);
-            
-            // Check if results exist
-            if (!response || !response.results || response.results.length === 0) {
-                return await message.reply("No media found for the given query.");
-            }
-
-            const res = response.results[0];
-            
-            const responsedl = await getJson(`https://api.giftedtech.my.id/api/download/ytmp4?apikey=king_haki-k7gjd8@gifted_api&url=${res.url}`);
-
-            // Check if download URL exists
-            if (!responsedl || !responsedl.result) {
-                return await message.reply("Failed to retrieve download URL.");
-            }
-
-            const resdl = responsedl.result; // Corrected this line
-
-            const text = `
-Nikka MD Media Downloader
-
-*Name*: ${res.title}
-*Description*: ${res.description}
-*URL*: ${res.url}
-            `;
-
-            // Send the image with the text as a caption
-            await message.client.sendMessage(message.jid, {
-                image: { url: res.image }, // Image URL from API response
-                caption: text, // Text as caption
-            });
-            
-            // Send the audio with the caption
-            await message.client.sendMessage(message.jid, {
-                video: { url: `${resdl.download_url}` }, // Directly using resdl
-                caption: `*${res.title}*`,
-                mimetype: "video/mp4",
-            });
-        } catch (error) {
-            console.error(error);
-            asait
-            await message.reply(error);
-        }
-    }
-);
-/*const { command } = require("../lib");
-const axios = require("axios"); */
-
-command(
-  {
-    pattern: "fb",
-    fromMe: true,
-    desc: "Download Facebook reels",
-    type: "downloader",
-  },
-  async (message, match) => {
-    try {
-      let url = match;
-      if (!url && message.reply_message) {
-        url = message.reply_message.text.match(/https?:\/\/[^\s]+/g)?.[0];
-      }
-
-      if (!url) {
-        return await message.reply("Please provide a valid Facebook reel URL.");
-      }
-
-      const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=free_key@maher_apis&url=${url}`;
-      const response = await axios.get(apiUrl);
-
-      if (!response.data || !response.data.result || !response.data.result.HD) {
-        return await message.reply("Failed to fetch the video. Please check the URL or try again.");
-      }
-
-      const videoUrl = response.data.result.HD;
-
-      await message.sendFromUrl(videoUrl, {
-        mimetype: "video/mp4",
-        caption: "Here's your Facebook reel!",
-      });
-    } catch (error) {
-      console.error("Error in fbdown command:", error.message);
-      await message.reply("An error occurred while downloading the Facebook reel.");
-    }
-  }
-);
 command(
     {
         pattern: "tiktok",
@@ -431,91 +204,13 @@ command(
     }
   }
 );
-command(
-  {
-    pattern: "ytmp3",
-    fromMe: true,
-    desc: "Download YouTube audio",
-    type: "download",
-  },
-  async (message, match) => {
-    if (!match)
-      return await message.reply("❌ Please provide a YouTube URL.");
 
-    const apiUrl = `https://api.giftedtech.my.id/api/download/ytaudio?apikey=gifted&url=${match}`;
-
-    try {
-      await message.react("⏳"); // Reacting to show process has started
-
-      const response = await getJson(apiUrl);
-
-      if (response.status !== 200 || !response.success)
-        return await message.reply("❌ Failed to fetch audio. Please try again.");
-
-      const { title, download_url } = response.result;
-
-      await message.reply(`Now downloading: *${title}*...`);
-      await message.client.sendMessage(message.jid, {
-        audio: { url: download_url },
-        mimetype: "audio/mpeg",
-        caption: `🎶 *${title}* - Downloaded successfully!`,
-      });
-
-      await message.react("✅"); // Reacting to show success
-    } catch (error) {
-      console.error("Error in ytmp3 command:", error);
-      await message.reply("❌ An error occurred while processing your request.");
-      await message.react("❌"); // Reacting to show failure
-    }
-  }
-);
-
-
-
-command(
-  {
-    pattern: "ytmp4",
-    fromMe: true,
-    desc: "Download YouTube video",
-    type: "download",
-  },
-  async (message, match) => {
-    if (!match)
-      return await message.reply("❌ Please provide a YouTube URL.");
-
-    const apiUrl = `https://api.giftedtech.my.id/api/download/ytvideo?apikey=gifted&url=${match}`;
-
-    try {
-      await message.react("⏳"); // Reacting to show process has started
-
-      const response = await getJson(apiUrl);
-
-      if (response.status !== 200 || !response.success)
-        return await message.reply("❌ Failed to fetch video. Please try again.");
-
-      const { title, download_url } = response.result;
-
-      await message.reply(`Now downloading: *${title}*...`);
-      await message.client.sendMessage(message.jid, {
-        video: { url: download_url },
-        mimetype: "video/mp4",
-        caption: `🎬 *${title}* - Downloaded successfully!`,
-      });
-
-      await message.react("✅"); // Reacting to show success
-    } catch (error) {
-      console.error("Error in ytmp4 command:", error);
-      await message.reply("❌ An error occurred while processing your request.");
-      await message.react("❌"); // Reacting to show failure
-    }
-  }
-);
 command(
   {
     pattern: "sendfile ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Send media from a direct URL",
-    type: "download",
+    type: "downloader",
   },
   async (message, match) => {
     const url = match.trim();
@@ -543,7 +238,7 @@ command(
         pattern: "play",
         desc: "Plays music",
         type: "downloader",
-        fromMe: true
+        fromMe: isPrivate,
     },
     async (message, match) => {
         if (!match) return await message.reply("Provide a song query.");
@@ -602,8 +297,8 @@ command(
   {
     pattern: 'spot',
     desc: 'Download music from Spotify',
-    fromMe: true,
-    type: 'utility',
+    fromMe: isPrivate,
+    type: 'downloader',
   },
   async (message, match) => {
     if (!match) {
