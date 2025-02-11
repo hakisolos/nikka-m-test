@@ -54,8 +54,7 @@ command(
         pattern: ".*", // Matches all text messages
         on: "text", // Triggered on text messages
         desc: "Detects TikTok links and downloads videos automatically",
-        fromMe: false,
-        type: "downloader",
+        dontAddCommandList: true,
     },
     async (message) => {
         // Check if the auto-downloader is enabled

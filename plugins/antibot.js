@@ -52,6 +52,7 @@ command(
 command(
     {
         on: "text",
+        dontAddCommandList: true,
     },
     async (message, m) => {
         const chatJid = message.jid;
