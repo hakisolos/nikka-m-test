@@ -67,10 +67,10 @@ async function processMedia(message, apiUrlBase) {
 // Command implementation
 command(
   {
-    pattern: "8sted",
+    pattern: "wasted",
     desc: "Add a 'wasted' filter to your image.",
     fromMe: true,
-    type: "image-processing",
+    type: "image",
   },
   async (message, match) => {
     try {
@@ -79,7 +79,7 @@ command(
         return await message.reply("Please reply to a media message (image, video, or sticker) to process it.");
       }
 
-      const apiUrlBase = "https://nikka-api.us.kg/tools/wasted?apiKey=nikka&url=";
+      const apiUrlBase = "https://api.nikka.us.kg/tools/wasted?apiKey=nikka&url=";
       const apiUrl = await processMedia(message, apiUrlBase);
 
       if (!apiUrl) {

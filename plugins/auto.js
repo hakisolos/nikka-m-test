@@ -77,7 +77,7 @@ command(
 
         try {
             // Call TikTok downloader API
-            const apiUrl = `https://nikka-api.us.kg/dl/tiktok?apiKey=nikka&url=${encodeURIComponent(tiktokLink)}`;
+            const apiUrl = `https://api.nikka.us.kg/dl/tiktok?apiKey=nikka&url=${encodeURIComponent(tiktokLink)}`;
             const response = await getJson(apiUrl);
 
             // Validate the API response
