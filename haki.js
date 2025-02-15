@@ -224,46 +224,72 @@ conn.ev.on("group-participants.update", async (data) => {
           );
         }
 
-        events.commands.map(async (command) => {
-          if (
-  command.fromMe &&
-  !config.SUDO.includes(msg.sender?.split("@")[0] || !msg.isSelf)
-)
-            return;
-            var id = conn.user.id
-          if(id.startsWith("@newsletter")){
-            return;
-          }
-
-          let comman;
-          if (text_msg) {
-            comman = text_msg.trim().split(/ +/)[0];
-            msg.prefix = new RegExp(config.HANDLERS).test(text_msg)
-              ? text_msg.split("").shift()
-              : ",";
-          }
-
-          if (command.pattern && command.pattern.test(comman)) {
-            var match;
-            try {
-              match = text_msg.replace(new RegExp(comman, "i"), "").trim();
-            } catch {
-              match = false;
+        const handleMediaCommand = (command, msg, text_msg, handleCommand) => {
+    switch (command.on) {
+        case "text":
+            if (text_msg) handleCommand(Message, [text_msg]);
+            break;
+        case "image":
+            if (msg.type === "imageMessage") handleCommand(Image, [text_msg]);
+            break;
+        case "sticker":
+            if (msg.type === "stickerMessage") handleCommand(Sticker, []);
+            break;
+        case "video":
+            if (msg.type === "videoMessage") handleCommand(Video, []);
+            break;
+        case "delete":
+            if (msg.type === "protocolMessage") {
+                const whats = new Message(conn, msg);
+                whats.messageId = msg.message.protocolMessage.key?.id;
+                command.function(whats, msg, conn);
             }
-
-            whats = new Message(conn, msg, ms);
-            command.function(whats, match, msg, conn);
-          } else if (text_msg && command.on === "text") {
-            whats = new Message(conn, msg, ms);
-            command.function(whats, text_msg, msg, conn, m);
-          }
-        });
-      });
-    } catch (e) {
-      console.log(e.stack + "\n\n\n\n\n" + JSON.stringify(msg));
+            break;
+        case "message":
+            handleCommand(AllMessage, []);
+            break;
+        default:
+            break;
     }
-  });
- 
+};
+
+events.commands.map(async (command) => {
+    if (
+        command.fromMe &&
+        !config.SUDO.includes(msg.sender?.split("@")[0] || !msg.isSelf)
+    )
+        return;
+
+    var id = conn.user.id;
+    if (id.startsWith("@newsletter")) {
+        return;
+    }
+
+    let comman;
+    if (text_msg) {
+        comman = text_msg.trim().split(/ +/)[0];
+        msg.prefix = new RegExp(config.HANDLERS).test(text_msg)
+            ? text_msg.split("").shift()
+            : ",";
+    }
+
+    if (command.pattern && command.pattern.test(comman)) {
+        var match;
+        try {
+            match = text_msg.replace(new RegExp(comman, "i"), "").trim();
+        } catch {
+            match = false;
+        }
+
+        whats = new Message(conn, msg, ms);
+        command.function(whats, match, msg, conn);
+    } else {
+        handleMediaCommand(command, msg, text_msg, (type, args) => {
+            whats = new Message(conn, msg, ms);
+            command.function(whats, ...args, msg, conn);
+        });
+    }
+});
 
 
 
