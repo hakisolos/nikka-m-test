@@ -27,7 +27,7 @@ require("events").EventEmitter.defaultMaxListeners = 50;
 const { File } = require("megajs");
 
 (async function () {
-  var prefix = "Nikka-X";
+  var prefix = "NIKKA-X";
   var output = "./lib/session/";
   var pth = output + "creds.json";
 
@@ -261,7 +261,7 @@ events.commands.map(async (command) => {
         return;
 
     var id = conn.user.id;
-    if (id.startsWith("@newsletter")) {
+    if (id.endsWith("@newsletter")) {
         return;
     }
 
