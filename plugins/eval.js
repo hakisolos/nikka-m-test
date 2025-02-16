@@ -43,7 +43,7 @@ const {
 const util = require("util");
 const config = require("../config");
 
-command({pattern:'eval', on: "text", fromMe: true, desc: 'Runs a server code'}, async (message, match, m, client) => {
+command({pattern:'eval', on: "text", dontAddCommandList: true, fromMe: true, desc: 'Runs a server code'}, async (message, match, m, client) => {
   if (match.startsWith("$")) {
     try {
       const code = `(async () => { ${match.replace("$", "")} })()`;

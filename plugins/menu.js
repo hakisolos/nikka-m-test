@@ -18,6 +18,7 @@ command(
     type: "user",
   },
   async (message, match, m, client) => {
+    await message.react("⏳️")
     try {
       if (match) {
         for (let i of plugins.commands) {
@@ -79,18 +80,21 @@ Description: ${i.desc}\`\`\``);
 
         // Random menu images
         const menuImages = [
-          "https://files.catbox.moe/mabris.jpg",
-          "https://files.catbox.moe/mabris.jpg",
-          "https://files.catbox.moe/mabris.jpg",
+          "https://cdn.ironman.my.id/i/hvlui0.jpg",
+          "https://cdn.ironman.my.id/i/hvlui0.jpg",
+          "https://cdn.ironman.my.id/i/hvlui0.jpg",
           config.BOT_INFO.split(";")[2], // Including the existing one
         ];
         const randomImage = menuImages[Math.floor(Math.random() * menuImages.length)];
 
         // Send the image with the menu text as caption
         return await message.sendFromUrl(randomImage, { caption: penu });
+        await message.react("")
       }
     } catch (e) {
       message.reply(e);
     }
   }
 );
+
+

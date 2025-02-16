@@ -6,39 +6,23 @@ const {
 } = require("../lib/");
 // nikka
 
-let audios = ["https://files.catbox.moe/ahf9me.mp3", "https://files.catbox.moe/cp9zab.mp3", "https://files.catbox.moe/eywp66.mp3", "https://files.catbox.moe/ahf9me.mp3", "https://files.catbox.moe/cp9zab.mp3"];
-command({
-  pattern: "alive ?(.*)",
-  fromMe: isPrivate,
-  desc: "nikka here",
-  type: "user"
-}, async (message, match, m, client) => {
-  try {
-    let aud = audios[Math.floor(Math.random() * audios.length)];
-    let buff = await getBuffer(aud);
-    await message.client.sendMessage(message.jid, {
-      'audio': buff,
-      'mimetype': "audio/mpeg",
-      'ptt': true,
-      'seconds': "0xbebc74b",
-      'fileLength': "100000000",
-      'contextInfo': {
-        'externalAdReply': {
-          'title': "ʜᴇʏ ᴘᴏᴏᴋɪᴇ",
-          'body': "𝗡𝗶𝗸𝗸𝗮 𝗺𝗱",
-          'sourceUrl': "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
-          'mediaUrl': "",
-          'mediaType': 1,
-          'showAdAttribution': true,
-          'renderLargerThumbnail': false,
-          'thumbnailUrl': "https://files.catbox.moe/mnp025.jpg"
-        }
-      }
-    });
-  } catch (error) {
-    return message.reply(error);
-  }
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const plugins = require("../lib/event");
 const {
     clockString,
@@ -262,116 +246,7 @@ command(
 );
 
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Lo- Zeta-X0
-*/
-/*
-command(
-  {
-    pattern: "menu",
-    fromMe: isPrivate,
-    desc: "Show All Commands",
-    dontAddCommandList: true,
-    type: "user",
-  },
-  async (message, match, m, client) => {
-    try {
-      if (match) {
-        for (let i of plugins.commands) {
-          if (
-            i.pattern instanceof RegExp &&
-            i.pattern.test(message.prefix + match)
-          ) {
-            const cmdName = i.pattern.toString().split(/\W+/)[1];
-            message.reply(`\`\`\`Command: ${message.prefix}${cmdName.trim()}
-Description: ${i.desc}\`\`\``);
-          }
-        }
-      } else {
-        let { prefix } = message;
-        let [date, time] = new Date()
-          .toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
-          .split(",");
-        let usern = message.pushName;
-        const readMore = String.fromCharCode(8206).repeat(4001);
-        let menu = `\n╭━━━〔 ${BOT_INFO.split(";")[0]} 〕━━━┈
-╚═════════════════✦═╝
-╔═════════════════✦═╗
-  ᯽ 𝗼𝘄𝗻𝗲𝗿: ${BOT_INFO.split(";")[1]}
-  ᯽ 𝘂𝘀𝗲𝗿: ${usern}
-  ᯽ 𝗱𝗮𝘁𝗲: ${date}
-  ᯽ 𝘁𝗶𝗺𝗲: ${time}
-  ᯽ 𝗰𝗺𝗱𝘀: ${plugins.commands.length}
-  ᯽ 𝗺𝗼𝗱𝗲: ${config.WORK_TYPE}
-  ᯽ 𝗽𝗿𝗲𝗳𝗶𝘅: ${config.HANDLERS}
-  ᯽ 𝘃𝗲𝗿𝘀𝗶𝗼𝗻: ${require("../package.json").version}
-╚═════════════════✦═╝${readMore}`;
 
-        let cmnd = [];
-        let cmd;
-        let category = [];
-        plugins.commands.map((command, num) => {
-          if (command.pattern instanceof RegExp) {
-            cmd = command.pattern.toString().split(/\W+/)[1];
-          }
-
-          if (!command.dontAddCommandList && cmd !== undefined) {
-            let type = command.type ? command.type.toLowerCase() : "misc";
-
-            cmnd.push({ cmd, type });
-
-            if (!category.includes(type)) category.push(type);
-          }
-        });
-        cmnd.sort();
-        category.sort().forEach((cmmd) => {
-          menu += `\n╔═════════════════✦═╗`;
-          menu += `\n  「 *${cmmd.toUpperCase()}* 」`;
-          menu += `\n╚═════════════════✦═╝`;
-          let comad = cmnd.filter(({ type }) => type == cmmd);
-          comad.forEach(({ cmd }) => {
-            menu += `\n[᯽]  ${cmd.trim()}`;
-          });
-          menu += `\n╚═════════════════✦═╝`;
-        });
-        menu += `\n\n𝗡𝗶𝗸𝗸𝗮 𝘅 𝗺𝗱`;
-
-        let penu = tiny(menu);
-        let img = config.BOT_INFO.split(";")[2];
-        return await message.sendFromUrl(
-          img,
-          {
-            fileLength: "5555544444",
-            gifPlayback: true,
-            contextInfo: {
-              externalAdReply: {
-                title: "𝗡𝗶𝗸𝗸𝗮",
-                body: "",
-                sourceUrl: "https://whatsapp.com/channel/0029VaoLotu42DchJmXKBN3L",
-                mediaUrl: "",
-                mediaType: 1,
-                showAdAttribution: true,
-                renderLargerThumbnail: false,
-                thumbnailUrl: "https://files.catbox.moe/mnp025.jpg",
-              },
-            },
-            caption: penu,
-          },
-          { quoted: message }
-        );
-      }
-    } catch (e) {
-      message.reply(e);
-    }
-  }
-);
-* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 command(
   {
@@ -466,11 +341,7 @@ command(
   }
 );
 
-/* Copyright (C) 2022 X-Electra.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-X-Asena - X-Electra
-*/
+
 
 command(
   { 
@@ -544,9 +415,9 @@ command(
 command(
     {
         pattern: "dev", // Command to display developer info
-        fromMe: true,
+        fromMe: isPrivate,
         desc: "Displays information about the developer",
-        type: "haki",
+        type: "user",
     },
     async (message) => {
         const devInfo = `
@@ -700,7 +571,7 @@ command(
     pattern: "autobio ?(.*)",
     fromMe: true,
     desc: "Enable/Disable autobio updates",
-    type: "utility",
+    type: "user",
   },
   async (message, match) => {
     const user = message.sender;
@@ -791,8 +662,8 @@ command(
   {
     pattern: "getDevice",
     desc: "Check the device type of a message sender",
-    type: "tools",
-    fromMe: true,
+    type: "user",
+    fromMe: isPrivate,
   },
   async (message) => {
     if (!message.reply_message) {
@@ -834,7 +705,7 @@ command(
         pattern: "save",
         desc: "Save and forward the status message",
         fromMe: true,
-        type: "ai",   
+        type: "user",   
     },
     async (message, match) => {
         // Check if the message contains a reply
@@ -861,7 +732,7 @@ command(
     pattern: "vv",
     fromMe: isPrivate,
     desc: "Forwards the View Once message",
-    type: "tool",
+    type: "user",
   },
   async (message, match) => {
 

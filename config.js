@@ -19,10 +19,11 @@ module.exports = {
   BRANCH: "main",
   WARN_COUNT: 3,
   STICKER_DATA: process.env.STICKER_DATA || "king;haki",
-  BOT_INFO: process.env.BOT_INFO || "ɴɪᴋᴋᴀ ᴍᴅ;ʜᴀᴋɪ;https://files.catbox.moe/mnp025.jpg",
-  AUDIO_DATA: process.env.AUDIO_DATA || "ʜᴀᴋɪ;shaka;https://files.catbox.moe/mnp025.jpg",
+  BOT_INFO: process.env.BOT_INFO || "ɴɪᴋᴋᴀ ᴍᴅ;ʜᴀᴋɪ;https://cdn.ironman.my.id/i/hvlui0.jpg",
+  AUDIO_DATA: process.env.AUDIO_DATA || "ʜᴀᴋɪ;shaka;https://cdn.ironman.my.id/i/hvlui0.jpg",
   ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
   PORT: process.env.PORT || 3000,
+
   CAPTION: process.env.CAPTION || "shaka",
   WORK_TYPE: process.env.WORK_TYPE || "private",
   DATABASE_URL: DATABASE_URL,

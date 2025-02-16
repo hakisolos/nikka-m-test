@@ -24,7 +24,7 @@ command(
         pattern: "autott ?(on|off)?", // Matches "!autodl on" or "!autodl off"
         fromMe: true, // Only the bot owner can toggle the state
         desc: "Enable or disable TikTok auto-downloader",
-        type: "settings",
+        type: "downloader",
     },
     async (message, match) => {
         const state = match && match.trim().toLowerCase(); // Get the toggle state

@@ -699,7 +699,7 @@ command(
         pattern: "greeting",
         desc: "Toggle greeting messages on or off.",
         fromMe: true,
-        type: "public", // This allows any user to run the command
+        type: "group", // This allows any user to run the command
     },
     async (message, match) => {
         if (!message.isGroup) return await message.reply("This command can only be used in groups.");

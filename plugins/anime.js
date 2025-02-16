@@ -12,7 +12,7 @@ command(
     pattern: "animewall",
     fromMe: true,
     desc: "Sends anime wallpapers with multiple CTA buttons",
-    type: "info",
+    type: "anime",
   },
   async (message) => {
     try {

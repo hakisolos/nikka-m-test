@@ -493,8 +493,8 @@ command(
     {
         pattern: "carbon",
         desc: "carbon img",
-        type: "misc",
-        fromMe: true,
+        type: "image",
+        fromMe: isPrivate,
     },
     async (message, match) => {
         if (!match) {

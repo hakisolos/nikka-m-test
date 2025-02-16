@@ -53,7 +53,7 @@ command(
     pattern: "url",
     desc: "Upload media (image, sticker, video) to Catbox",
     fromMe: true,
-    type: "utility",
+    type: "converter",
   },
   async (message, match) => {
     try {

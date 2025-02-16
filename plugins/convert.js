@@ -98,7 +98,7 @@ command(
     {
         pattern: "obf",
         desc: "obfuscate JavaScript code",
-        type: "convert",
+        type: "converter",
         fromMe: isPrivate,  
     },
     async (message) => {
