@@ -14,7 +14,6 @@ const events = require("./lib/event");
 const got = require("got");
 const config = require("./config");
 const { PluginDB } = require("./lib/database/plugins");
-const Greetings = require("./lib/Greetings");
 const saveCreds = require("./lib/session");
 require('module-alias/register');
 
@@ -147,7 +146,7 @@ async function startNikka() {
       const packageVersion = require("./package.json").version;
       const totalPlugins = events.commands.length;
       const workType = config.WORK_TYPE;
-      const statusMessage = `ׂ╰┈➤Nikka x md connected  ✅\n ׂ╰┈➤ᴠᴇʀsɪᴏɴ: ${packageVersion}\n ׂ╰┈➤ᴄᴍᴅs: ${totalPlugins}\n ׂ╰┈➤ᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n ׂ╰┈➤𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
+      const statusMessage = `ׂNikka x md connected  ✅\n ׂᴠᴇʀsɪᴏɴ: ${packageVersion}\n ׂᴄᴍᴅs: ${totalPlugins}\n ׂᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n ׂ𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
 
       await conn.sendMessage(conn.user.id, {text: statusMessage})
     }

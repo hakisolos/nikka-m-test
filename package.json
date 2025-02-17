@@ -81,6 +81,8 @@
     "@lib": "./lib",
     "@ai": "./lib/functions/ai.js",
     "@search": "./lib/functions/search.js",
+    "@anime": "./lib/functions/anime.js",
+    "@start": "./lib/haki.js",
     "@config": "./config.js"
   }
 }
