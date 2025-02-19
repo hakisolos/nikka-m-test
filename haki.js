@@ -245,6 +245,9 @@ conn.ev.on("group-participants.update", async (data) => {
           if (command.pattern && command.pattern.test(comman)) {
             var match;
             try {
+              await conn.sendMessage(msg.key.remoteJid, {
+  react: { text: "⏳️", key: msg.key },
+});
               match = text_msg.replace(new RegExp(comman, "i"), "").trim();
             } catch {
               match = false;
