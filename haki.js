@@ -255,9 +255,7 @@ conn.ev.on("group-participants.update", async (data) => {
 
             whats = new Message(conn, msg, ms);
             command.function(whats, match, msg, conn);
-            await conn.sendMessage(msg.key.remoteJid, {
-  react: { text: "", key: msg.key },
-});
+            
           } else if (text_msg && command.on === "text") {
             whats = new Message(conn, msg, ms);
             command.function(whats, text_msg, msg, conn, m);
@@ -265,6 +263,7 @@ conn.ev.on("group-participants.update", async (data) => {
         });
       });
     } catch (e) {
+      await conn.sendMessage(msg.sender, {text: e })
       console.log(e.stack + "\n\n\n\n\n" + JSON.stringify(msg));
     }
   });
