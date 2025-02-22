@@ -270,7 +270,7 @@ command(
 const yts = require("yt-search");
 command(
     {
-        pattern: "play",
+        pattern: "pla",
         desc: "Downloads music",
         type: "downloader",
         fromMe: isPrivate,
@@ -288,19 +288,16 @@ command(
             if (!search.all.length) {
                 return await m.send("No results found.");
             }
-
+           
             const vidurl = search.all[0].url;
-            const apiurl = `https://ditzdevs-ytdl-api.hf.space/api/ytmp3?url=${vidurl}`;
+            const apiurl = `https://api.giftedtech.my.id/api/download/ytmp3?apikey=gifted&url=${vidurl}`;
             const response = await getJson(apiurl);
 
-            // Check if the API response is valid
-            if (!response || !response.status || !response.download) {
-                return await m.send("Invalid response from server.");
-            }
+            
 
-            const aud = response.download.downloadUrl;
-            const title = response.download.title;
-            const img = response.result?.thumbnail?.[0]?.url || ""; // Get the first available thumbnail
+            const aud = response.result.download_url;
+            const title = response.result.title;
+            const img = response.result.thumbnail || ""; // Get the first available thumbnail
 
             if (!aud) {
                 return await m.send("Download URL not found.");
