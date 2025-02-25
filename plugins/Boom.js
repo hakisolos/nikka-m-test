@@ -1,3 +1,5 @@
+
+const { command } = require("../lib");
 command(
   {
     pattern: "boom",
