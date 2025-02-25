@@ -1,32 +1,22 @@
 command(
   {
-    pattern: "slides",
+    pattern: "boom",
     desc: "Send an interactive slide carousel",
     fromMe: true,
     type: "media",
   },
   async (message, match) => {
     try {
-      const slides = [
+      const slide = [
         [
           "https://files.catbox.moe/h5rnap.jpg", // Image URL
           "Welcome to H4KI XER", // Slide Title
           "Explore the latest features of our bot.", // Body Text
           "Your trusted AI assistant", // Footer Text
-          "Learn More", // Button Text
-          "cmd_info", // Command ID
-          "cta_url", // Button Type (URL button)
-          "https://example.com/info" // Button URL
-        ],
-        [
-          "https://files.catbox.moe/h5rnap.jpg",
-          "Advanced AI Capabilities",
-          "Experience next-level AI responses.",
-          "Powered by AI Technology",
-          "Try Now",
-          "cmd_try",
-          "cta_url",
-          "https://example.com/try"
+          "CLICK ME!", // Button Text
+          "cmd_click", // Command ID
+          "quick_reply", // Button Type (Quick Reply)
+          "" // No URL needed for quick reply
         ]
       ];
 
@@ -37,13 +27,12 @@ command(
         "Check out what our bot can do!", // Message Text
         message, // Quoted Message
         "Developed by H4KI XER", // Footer Text
-        slides
+        slide
       );
 
-      
     } catch (error) {
-      console.error("Error sending slides:", error);
-      await message.reply("Failed to send slides. Please try again.");
+      console.error("Error sending slide:", error);
+      await message.reply("Failed to send slide. Please try again.");
     }
   }
 );
