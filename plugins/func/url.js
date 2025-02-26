@@ -60,4 +60,4 @@ async function upload(message) {
   }
 }
 
-await upload(message.reply_message)
+module.exports = { upload };
