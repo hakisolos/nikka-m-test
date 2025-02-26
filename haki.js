@@ -75,8 +75,7 @@ async function startNikka() {
   await config.DATABASE.sync();
 
   const { state, saveCreds } = await useMultiFileAuthState(
-    "./lib/session",
-    pino({ level: "silent" })
+    "./lib/session"
   );
 
   let conn = makeWASocket({
