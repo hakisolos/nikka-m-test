@@ -1,6 +1,6 @@
 const warnings = {}; // Temporary in-memory DB for warnings
 const { command } = require("../lib");
-command(
+command( 
   {
     pattern: "warn ?(.*)",
     fromMe: true,
