@@ -4,7 +4,7 @@ const { command,  isPrivate } = require('../lib');
 command(
   {
     pattern: 'listpc',
-    fromMe: isPrivate,
+    fromMe: isPrivate, 
     desc: 'Get direct messages summary',
     type: 'user',
   },
