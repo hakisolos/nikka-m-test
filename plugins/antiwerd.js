@@ -9,7 +9,7 @@ const {
 command(
   {
     pattern: 'antiword',
-    desc: 'Set Antiword Management for Group Chats',
+    desc: 'Set Antiword Management for Group Chats', 
     fromMe: true,
     type: 'group',
   },
