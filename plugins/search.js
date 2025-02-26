@@ -1,5 +1,6 @@
 const { command, getJson, isPrivate } = require("@lib");
 const axios = require("axios");
+const { tiny } = require("../lib/fancy_font/fancy");
 const { unsplash, fetchPinterestImages, fetchPixabay, wiki } = require("@search");
 command(
     {
@@ -287,4 +288,42 @@ command(
       }
     }
   );
-  
+
+command(
+    {
+        pattern: "def",
+        desc: "define stuff",
+        type: "search",
+        fromMe: isPrivate,
+    },
+    async(message, match) => {
+        const q = match || message.reply_message.text
+        if(!q){
+            return m.send(`hey ${message.pushName}, i need a query`)
+
+        }
+        try{
+            const response = await getJson(`https://api.giftedtech.my.id/api/tools/define?apikey=gifted&term=${q}`)
+            const res = response.results[0]
+            const text = `
+Word: ${res.word}
+
+Definition: ${res.definition}
+
+Author: ${res.author}
+
+Written_on: ${res.written_on}
+
+Example: ${res.example}
+
+Thumbs_down: ${res.thumbs_down}
+            `
+            const tes = await tiny(text)
+            const init = await message.client.sendMessage(message.jid, {text: "searching..."})
+            await message.fek(init.key, tes)
+        }catch(e){
+            await m.send(e)
+        }
+
+    }
+)
