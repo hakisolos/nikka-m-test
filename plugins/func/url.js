@@ -7,27 +7,20 @@ const MAX_FILE_SIZE_MB = 200;
 
 async function upload(message) {
   try {
-    if (
-      !message.reply_message ||
-      (!message.reply_message.image &&
-        !message.reply_message.sticker &&
-        !message.reply_message.audio &&
-        !message.reply_message.document &&
-        !message.reply_message.video)
-    ) {
-      return "Please reply to a message containing an image, sticker, or video.";
+    if (!message) {
+      throw new Error("No message provided.");
     }
 
     // Download the media
-    const mediaBuffer = await downloadMediaMessage(message.reply_message, 'buffer');
+    const mediaBuffer = await downloadMediaMessage(message, 'buffer');
     if (!mediaBuffer) {
-      return "Failed to download the media.";
+      throw new Error("Failed to download the media.");
     }
 
     // Check file size
     const fileSizeMB = mediaBuffer.length / (1024 * 1024);
     if (fileSizeMB > MAX_FILE_SIZE_MB) {
-      return `File size exceeds the limit of ${MAX_FILE_SIZE_MB}MB.`;
+      throw new Error(`File size exceeds the limit of ${MAX_FILE_SIZE_MB}MB.`);
     }
 
     // Detect file type
@@ -51,12 +44,14 @@ async function upload(message) {
 
     const mediaUrl = await res.text();
 
-    return mediaUrl.startsWith("http")
-      ? `Media uploaded successfully: ${mediaUrl}`
-      : mediaUrl;
+    if (!mediaUrl.startsWith("http")) {
+      throw new Error("Invalid response from server.");
+    }
+
+    return mediaUrl;
   } catch (error) {
     console.error("Error during media upload:", error);
-    return "Failed to upload the media. Please try again.";
+    return null; // Return null if upload fails
   }
 }
 
