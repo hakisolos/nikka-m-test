@@ -31,7 +31,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "kick ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "kick a person from the group",
     type: "group",
   },
@@ -56,7 +56,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "promote ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "promote a member",
     type: "group",
   },
@@ -80,7 +80,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "demote ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "demote a member",
     type: "group",
   },
@@ -104,7 +104,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "mute",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "nute group",
     type: "group",
   },
@@ -127,7 +127,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "unmute",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "unmute group",
     type: "group",
   },
@@ -150,7 +150,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "gjid",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "gets jid of all group members",
     type: "group",
   },
@@ -178,7 +178,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "tagall?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "mention all users in group",
     type: "group",
   },
@@ -205,7 +205,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "tag",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "mention all users in group",
     type: "group",
   },
@@ -287,7 +287,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "revoke ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Revoke Group invite link.",
     type: "group",
   },
@@ -309,7 +309,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "join ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Join in the group",
     type: "group",
   },
@@ -331,7 +331,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "left ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Left from the group",
     type: "group",
   },
@@ -344,7 +344,7 @@ command(
 command(
   {
     pattern: "lock ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "only allow admins to modify the group's settings.",
     type: "group",
   },
@@ -367,7 +367,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "unlock ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "allow everyone to modify the group's settings.",
     type: "group",
   },
@@ -390,7 +390,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "gname ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Change group subject",
     type: "group",
   },
@@ -414,7 +414,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "gdesc ?(.*)",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Change group description",
     type: "group",
   },
@@ -438,7 +438,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "gpp$",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Change Group Icon",
     type: "group",
   },
@@ -495,7 +495,7 @@ Louis-X0 - Zeta-X0
 command(
   {
     pattern: "fullgpp$",
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Change Group Icon",
     type: "group",
   },
@@ -546,7 +546,7 @@ async function generateProfilePicture(buffer) {
 command(
     {
         pattern: "vcf",
-        fromMe: false,
+        fromMe: isPrivate,
         desc: "Generate a VCF file of group contacts with WhatsApp names",
         type: "group",
     },
@@ -620,7 +620,7 @@ END:VCARD
 command(
   {
     pattern: "pick ?(.*)", // Command to pick a random user
-    fromMe: true,
+    fromMe: isPrivate,
     desc: "Pick a random person from the group with a specific context",
     type: "group",
   },
