@@ -716,7 +716,7 @@ command(
 
 
 
-command(
+/*command(
   {
       pattern: "blocklist",
       desc: "Fetches the blocked contacts list",
@@ -746,7 +746,7 @@ command(
   }
 );
 
-
+*/
 
 
 command(
