@@ -715,7 +715,7 @@ command(
 );
 
 
-/*sj
+
 command(
   {
       pattern: "blocklist",
@@ -733,17 +733,19 @@ command(
 
           let mentions = blockedUsers;
           let blockedList = blockedUsers.map((jid, index) => 
-              ${index + 1}. @${jid.split("@")[0]}
-          ).join("\n");
+            ${index + 1}. @${jid.split("@")[0]}
+        ).join("\n");
+        
 
-          await message.reply(🚫 *Blocked Contacts:*\n\n${blockedList}, { mentions });
+        await message.reply(🚫 *Blocked Contacts:*\n\n${blockedList}, { mentions });
+
       } catch (error) {
           console.error(error);
           await message.reply("An error occurred while fetching the blocklist.");
       }
   }
 );
-*/
+
 
 
 
