@@ -22,11 +22,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -47,11 +43,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -95,12 +87,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
-
 command(
   {
     pattern: "mute",
@@ -118,11 +104,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 command(
   {
@@ -141,11 +122,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -168,11 +145,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 
 command(
@@ -187,7 +159,7 @@ command(
     const { participants } = await message.client.groupMetadata(message.jid);
     let teks = "";
     for (let mem of participants) {
-      teks += `彡 @${mem.id.split("@")[0]}\n`;
+      teks += `᯽ @${mem.id.split("@")[0]}\n`;
     }
     message.sendMessage(teks.trim(), {
       mentions: participants.map((a) => a.id),
@@ -195,11 +167,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 
 command(
@@ -219,12 +187,6 @@ command(
     });
   }
 );
-
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 command(
   {
@@ -256,11 +218,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 command(
   {
@@ -278,11 +235,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 command(
   {
@@ -300,12 +252,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
-
 command(
   {
     pattern: "join ?(.*)",
@@ -322,11 +268,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -358,11 +300,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -381,11 +319,7 @@ command(
 );
   
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -397,7 +331,7 @@ command(
   async (message, match) => {
     if (!message.isGroup) return await message.reply("*_This command only works in group chats_*")
     match = match || message.reply_message.text
-    if (!match) return await message.reply("*_Need Subject!_*\n*_Example: gname Ezra-MD Support!_.*")
+    if (!match) return await message.reply("*_Need Subject!_*\n*_Example: gname Nikka-MD Support!_.*")
     var { restrict } = message.client.groupMetadata(message.jid);;
     if (restrict && !(await isAdmin(message))) return await message.reply("*_I'm not admin_*");
     await message.client.groupUpdateSubject(message.jid, match)
@@ -405,11 +339,6 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
 
 command(
   {
@@ -421,7 +350,7 @@ command(
   async (message, match) => {
     if (!message.isGroup) return await message.reply("*_This command only works in group chats_*")
     match = match || message.reply_message.text
-    if (!match) return await message.reply("*_Need Description!_*\n*_Example: gdesc Ezra-XD Wa BOT!_*")
+    if (!match) return await message.reply("*_Need Description!_*\n*_Example: gdesc nikka-md Wa BOT!_*")
     const participants =  await message.client.groupMetadata(message.jid)
     if (participants && !(await isAdmin(message.jid, message.user, message.client))) return await message.reply("_I'm not admin_");
     await message.client.groupUpdateDescription(message.jid, match)
@@ -429,11 +358,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -702,6 +627,8 @@ command(
         type: "group", // This allows any user to run the command
     },
     async (message, match) => {
+      var admin = await isAdmin(message.jid, message.user, message.client);
+      if (!admin) return await message.reply("*_I'm not admin_*");
         if (!message.isGroup) return await message.reply("This command can only be used in groups.");
 
         const action = match.toLowerCase();
@@ -720,3 +647,165 @@ command(
         fs.writeFileSync("../config.js", `module.exports = ${JSON.stringify(config, null, 2)};`);
     }
 );
+
+
+command(
+  {
+      pattern: "acceptall",
+      desc: "Accepts all pending group join requests",
+      fromMe: isPrivate,
+      type: "group",
+  },
+  async (message) => {
+      try {
+        var admin = await isAdmin(message.jid, message.user, message.client);
+        if (!admin) return await message.reply("*_I'm not admin_*");   
+        const jid = message.jid;
+          if (!jid.endsWith("@g.us")) {  // Corrected 'endswith' to 'endsWith'
+              return message.reply("This command can only be used in groups.");
+          }
+          const requests = await message.client.groupRequestParticipantsList(message.jid);
+
+          if (!requests || requests.length === 0) {
+              return await message.reply("No pending join requests to accept.");
+          }
+
+          let userJIDs = requests.map(user => user.jid);
+          await message.client.groupRequestParticipantsUpdate(message.jid, userJIDs, 'approve');
+
+          let mentions = userJIDs;
+          let acceptedList = userJIDs.map((jid, index) => 
+              `${index + 1}. @${jid.split("@")[0]}`
+          ).join("\n");
+
+          await message.reply(`*Accepted Join Requests:*\n\n${acceptedList}`, { mentions });
+      } catch (error) {
+          console.error(error);
+          await message.reply("An error occurred while accepting join requests.");
+      }
+  }
+);
+
+
+command(
+  {
+      pattern: "rejectall",
+      desc: "Accepts all pending group join requests",
+      fromMe: isPrivate,
+      type: "group",
+  },
+  async (message) => {
+      try {
+        var admin = await isAdmin(message.jid, message.user, message.client);
+        if (!admin) return await message.reply("*_I'm not admin_*");
+        const jid = message.jid;
+          if (!jid.endsWith("@g.us")) {  // Corrected 'endswith' to 'endsWith'
+              return message.reply("This command can only be used in groups.");
+          }
+          const requests = await message.client.groupRequestParticipantsList(message.jid);
+
+          if (!requests || requests.length === 0) {
+              return await message.reply("No pending join requests to accept.");
+          }
+
+          let userJIDs = requests.map(user => user.jid);
+          await message.client.groupRequestParticipantsUpdate(message.jid, userJIDs, 'reject');
+
+          let mentions = userJIDs;
+          let acceptedList = userJIDs.map((jid, index) => 
+              `${index + 1}. @${jid.split("@")[0]}`
+          ).join("\n");
+
+          await message.reply(`*Accepted Join Requests:*\n\n${acceptedList}`, { mentions });
+      } catch (error) {
+          console.error(error);
+          await message.reply("An error occurred while accepting join requests.");
+      }
+  }
+);
+
+
+command(
+  {
+      pattern: "listrequest",
+      desc: "Lists all pending group join requests",
+      fromMe: isPrivate,
+      type: "group",
+  },
+  async (message) => {
+    
+      try {
+        var admin = await isAdmin(message.jid, message.user, message.client);
+         if (!admin) return await message.reply("*_I'm not admin_*");
+        const jid = message.jid;
+          if (!jid.endsWith("@g.us")) {  // Corrected 'endswith' to 'endsWith'
+              return message.reply("This command can only be used in groups.");
+          }
+          const requests = await message.client.groupRequestParticipantsList(message.jid);
+
+          if (!requests || requests.length === 0) {
+              return await message.reply("No pending join requests.");
+          }
+
+          let mentions = requests.map(user => user.jid);
+          let requestList = requests.map((user, index) => 
+              `${index + 1}. @${user.jid.split("@")[0]}`
+          ).join("\n");
+
+          await message.reply(`*Pending Join Requests:*\n\n${requestList}`, { mentions });
+      } catch (error) {
+          console.error(error);
+          await message.reply("An error occurred while fetching join requests.");
+      }
+  }
+);
+
+
+command(
+  {
+      pattern: "newgc ?(.*)",
+      desc: "Create a new WhatsApp group",
+      fromMe: true,
+      type: "group",
+  },
+  async (message, match) => {
+      try {
+          if (!match && !message.reply_message) {
+              return await message.reply("Usage: *.newgc <group name>, @user* or reply to a user with *.newgc <group name>*");
+          }
+
+          let [groupName, ...members] = match.split(",");
+          groupName = groupName.trim();
+
+          if (!groupName) {
+              return await message.reply("Please provide a group name.");
+          }
+
+          let participants = [];
+
+          // Add mentioned users
+          if (message.mentionedJid) {
+              participants.push(...message.mentionedJid);
+          }
+
+          // If replying to someone, add them
+          if (message.reply_message) {
+              participants.push(message.reply_message.sender);
+          }
+
+          // Ensure at least one participant
+          if (participants.length === 0) {
+              return await message.reply("Please mention at least one user to add.");
+          }
+
+          // Create group
+          let group = await message.client.groupCreate(groupName, participants);
+
+          await message.reply(`✅ *Group Created!*\n\n📌 *Name:* ${groupName}\n👥 *Members:* ${participants.map(jid => `@${jid.split("@")[0]}`).join(", ")}`, { mentions: participants });
+      } catch (error) {
+          console.error(error);
+          await message.reply("An error occurred while creating the group.");
+      }
+  }
+);
+

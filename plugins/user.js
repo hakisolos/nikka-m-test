@@ -5,24 +5,7 @@ const {
   getBuffer
 } = require("../lib/");
 // nikka
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const { downloadMediaMessage } = require("@whiskeysockets/baileys");
 const plugins = require("../lib/event");
 const {
     clockString,
@@ -38,6 +21,7 @@ const config = require("../config");
 const { tiny } = require("../lib/fancy_font/fancy");
 const Jimp = require("jimp");
 const got = require("got");
+const path = require("path")
 const fs = require("fs");
 const { PluginDB, installPlugin } = require("../lib/database/plugins");
 
@@ -149,11 +133,7 @@ command(
   }
 );
 
-/* Copyright (C) 2022 X-Electra.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-X-Asena - X-Electra
-*/
+
 
 command(
   {
@@ -177,11 +157,7 @@ command(
   }
 );
 
-/* Copyright (C) 2022 X-Electra.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-X-Asena - X-Electra
-*/
+
 
 command(
   {
@@ -205,11 +181,7 @@ command(
   }
 );
 
-/* Copyright (C) 2022 X-Electra.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -225,11 +197,7 @@ command(
   }
 );
 
-/* Copyright (C) 2024 Louis-X0.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Louis-X0 - Zeta-X0
-*/
+
 
 command(
   {
@@ -278,17 +246,12 @@ command(
       if (desc) menu += `\n│  Use: \`\`\`${desc}\`\`\``;
       menu += `\n│\n`;
     });
-    menu += `╰───────┈┫「 𝐈𝐙𝐔𝐌𝐈 」┣┈────♡`;
+    menu += `╰───────┈┫「 NIKKA 」┣┈────♡`;
     return await message.reply(message.jid, { text: (tiny(menu)) })
 })
 
 
 
-/* Copyright (C) 2022 X-Electra.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-X-Asena - X-Electra
-*/
 
 command(
   {
@@ -368,11 +331,7 @@ command(
   }
 );
 
-/* Copyright (C) 2022 X-Electra.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-X-Asena - X-Electra
-*/
+
 
 command(
   {
@@ -725,30 +684,175 @@ command(
         }
     }
 );
-const { downloadMediaMessage } = require("@whiskeysockets/baileys");
+
 
 command(
   {
-    pattern: "vv",
-    fromMe: isPrivate,
-    desc: "Forwards the View Once message",
-    type: "user",
+      pattern: "listgc",
+      desc: "Lists all the groups you are in",
+      fromMe: isPrivate,
+      type: "user",
   },
-  async (message, match) => {
+  async (message) => {
+      try {
+         
 
-    if (!message.reply_message) {
-      return await message.reply("Reply to a View Once message.");
-    }
+          const groups = await message.client.groupFetchAllParticipating();
+          let groupList = Object.values(groups).map((group, index) => 
+              `${index + 1}. *${group.subject}*\n   JID: ${group.id}`
+          ).join("\n\n");
 
-    try {
-      await message.react("⏳️")	    
-      let buff = await downloadMediaMessage(message.reply_message, "buffer");
-      return await message.sendFile(buff);
-      await message.react("⏳️")
-    } catch (err) {
-      console.error(err);
-      return await message.reply("Failed to download media.");
-    }
+          if (!groupList) {
+              return await message.reply("You are not in any groups.");
+          }
+
+          await message.reply(`*Your Groups:*\n\n${groupList}`);
+      } catch (error) {
+          console.error(error);
+          await message.reply("An error occurred while fetching your groups.");
+      }
   }
 );
 
+
+/*sj
+command(
+  {
+      pattern: "blocklist",
+      desc: "Fetches the blocked contacts list",
+      fromMe: true,
+      type: "user",
+  },
+  async (message) => {
+      try {
+          let blockedUsers = await message.client.fetchBlocklist();
+
+          if (!blockedUsers || blockedUsers.length === 0) {
+              return await message.reply("✅ No blocked contacts found.");
+          }
+
+          let mentions = blockedUsers;
+          let blockedList = blockedUsers.map((jid, index) => 
+              ${index + 1}. @${jid.split("@")[0]}
+          ).join("\n");
+
+          await message.reply(🚫 *Blocked Contacts:*\n\n${blockedList}, { mentions });
+      } catch (error) {
+          console.error(error);
+          await message.reply("An error occurred while fetching the blocklist.");
+      }
+  }
+);
+*/
+
+
+
+command(
+    {
+        pattern: "vv",
+        desc: "Convert view once media to normal",
+        fromMe: isPrivate,
+        type: "user",
+    },
+    async (message, match) => {
+        try {
+            if (!message.reply_message) {
+                return await message.reply("⚠ Reply to a view-once image, video, or audio with .unvv");
+            }
+
+            let mediaType = Object.keys(message.reply_message.message)[0];
+            if (!["imageMessage", "videoMessage", "audioMessage"].includes(mediaType)) {
+                return await message.reply("⚠ Only view-once images, videos, and audio can be converted.");
+            }
+
+            // Create "temp" folder if it doesn't exist
+            const tempFolder = path.join(__dirname, "temp");
+            if (!fs.existsSync(tempFolder)) {
+                fs.mkdirSync(tempFolder, { recursive: true });
+            }
+
+            // Define media path
+            let extension = mediaType.includes("audio") ? "mp3" : mediaType.includes("video") ? "mp4" : "jpg";
+            let mediaPath = path.join(tempFolder, `${Date.now()}.${extension}`);
+
+            // Download media
+            let buffer = await downloadMediaMessage(message.reply_message, "buffer");
+            fs.writeFileSync(mediaPath, buffer);
+
+            // Get caption (if available)
+            let caption = message.reply_message.message[mediaType]?.caption || "";
+
+            // Send as normal media
+            await message.client.sendMessage(
+                message.jid,
+                {
+                    [mediaType.replace("Message", "")]: { url: mediaPath },
+                    caption: caption,
+                }
+            );
+
+            // Delete file after sending
+            setTimeout(() => fs.unlinkSync(mediaPath), 5000);
+        } catch (error) {
+            console.error(error);
+            await message.reply("❌ Failed to process media.");
+        }
+    }
+);
+
+
+
+command(
+    {
+        pattern: "tovv",
+        desc: "Convert media to view once",
+        fromMe: isPrivate,
+        type: "user",
+    },
+    async (message, match) => {
+        try {
+            if (!message.reply_message) {
+                return await message.reply("⚠ Reply to an image, video, or audio with .tovv");
+            }
+
+            let mediaType = Object.keys(message.reply_message.message)[0];
+            if (!["imageMessage", "videoMessage", "audioMessage"].includes(mediaType)) {
+                return await message.reply("⚠ Only images, videos, and audio can be converted to view once.");
+            }
+
+            // Create "temp" folder if it doesn't exist
+            const tempFolder = path.join(__dirname, "temp");
+            if (!fs.existsSync(tempFolder)) {
+                fs.mkdirSync(tempFolder, { recursive: true });
+            }
+
+            // Define media path
+            let extension = mediaType.includes("audio") ? "mp3" : mediaType.includes("video") ? "mp4" : "jpg";
+            let mediaPath = path.join(tempFolder, `${Date.now()}.${extension}`);
+
+
+            // Download media
+            let buffer = await downloadMediaMessage(message.reply_message, "buffer");
+            fs.writeFileSync(mediaPath, buffer);
+
+            // Get caption (if available)
+            let caption = message.reply_message.message[mediaType]?.caption || "";
+
+            // Send as view once
+            await message.client.sendMessage(
+                message.jid,
+                {
+                    [mediaType.replace("Message", "")]: { url: mediaPath },
+                    viewOnce: true,
+                    caption: caption,
+                }
+            );
+
+            // Delete file after sending
+            setTimeout(() => fs.unlinkSync(mediaPath), 5000);
+        } catch (error) {
+            console.error(error);
+            await message.reply("❌ Failed to process media.");
+        }
+    }
+);

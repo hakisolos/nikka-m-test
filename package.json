@@ -25,7 +25,6 @@
     "url": "https://github.com/hakisolos/nikka-x-md/issues"
   },
   "homepage": "https://github.com/hakisolos/nikka-x-md#readme",
-  
   "dependencies": {
     "@bochilteam/scraper": "3.0.0",
     "@neeraj-x0/textpro": "^1.0.3",
@@ -64,7 +63,7 @@
     "pg": "^8.8.0",
     "pino": "^8.1.0",
     "pm2": "^5.2.0",
-    "qrcode": "^1.5.1",
+    "qrcode": "^1.5.4",
     "qrcode-reader": "^1.0.4",
     "qs": "^6.11.0",
     "raganork-bot": "^3.0.1",

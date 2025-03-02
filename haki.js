@@ -3,6 +3,7 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   Browsers,
+  makeCacheableSignalKeyStore,
   makeInMemoryStore,
 } = require("haki-baileys");
 const fs = require("fs");
@@ -74,18 +75,24 @@ async function startNikka() {
   console.log("Syncing Database");
   await config.DATABASE.sync();
 
-  const { state, saveCreds } = await useMultiFileAuthState(
-    "./lib/session"
-  );
-
-  let conn = makeWASocket({
-    logger: pino({ level: "silent" }),
-    auth: state,
-    printQRInTerminal: true,
-    browser: Browsers.macOS("Desktop"),
-    downloadHistory: false,
-    syncFullHistory: false,
+  const { state, saveCreds } = await useMultiFileAuthState("./lib/session", {
+    store: true, 
   });
+  
+
+  const conn = makeWASocket({
+    auth: {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" })),
+    },
+    msgRetryCounterCache: new Map(), // Ensures messages are retried properly
+    printQRInTerminal: true,
+    logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+    browser: Browsers.macOS("Safari"),
+    markOnlineOnConnect: true,
+  });
+  
+  
 
   store.bind(conn.ev);
 
@@ -229,17 +236,18 @@ conn.ev.on("group-participants.update", async (data) => {
 )
             return;
             var id = conn.user.id
-          if(id.startsWith("@newsletter")){
+          if(id.endsWith("@newsletter")){
             return;
           }
 
           let comman;
           if (text_msg) {
             comman = text_msg.trim().split(/ +/)[0];
-            msg.prefix = new RegExp(config.HANDLERS).test(text_msg)
-              ? text_msg.split("").shift()
-              : ",";
+            const handlerRegex = new RegExp(
+              `^(${config.HANDLERS.split("").map(h => h.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")).join("|")})`);            
+            msg.prefix = handlerRegex.test(text_msg) ? text_msg.charAt(0) : ",";
           }
+
 
           if (command.pattern && command.pattern.test(comman)) {
             var match;
@@ -247,7 +255,8 @@ conn.ev.on("group-participants.update", async (data) => {
               await conn.sendMessage(msg.key.remoteJid, {
   react: { text: "⏳️", key: msg.key },
 });
-              match = text_msg.replace(new RegExp(comman, "i"), "").trim();
+              match = text_msg.replace(new RegExp(`^\\${comman}\\s*`, "i"), "").trim();
+
             } catch {
               match = false;
             }

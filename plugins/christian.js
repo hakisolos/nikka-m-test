@@ -7,7 +7,7 @@ command(
         type: "christian",
         fromMe: isPrivate,
     },
-    async(message, match) => {
+    async(message, m, match) => {
         try{
             if(!match){
                 return m.send("give me a bible vercel in the format .bible John,3:16")
