@@ -6,3 +6,4 @@ WORKDIR /nikka-md
 RUN yarn install --production
 EXPOSE 8000
 CMD ["npm", "start"]
+ 
