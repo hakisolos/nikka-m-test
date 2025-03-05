@@ -626,10 +626,15 @@ command(
   },
   async (message) => {
     if (!message.reply_message) {
-      return await message.send("Please reply to a message to check the device type.");
+      return await message.haki("Please reply to a message to check the device type.");
     }
 
     try {
+      // Check if the message ID starts with "H4KI"
+      if (message.reply_message.id.startsWith("H4KI")) {
+        return await message.haki("NIKKA MD");
+      }
+
       // Extract the device type
       const device = getDevice(message.reply_message.key.id);
 
@@ -647,15 +652,15 @@ command(
           deviceType = "WhatsApp Web";
           break;
         default:
-          deviceType = "Unknown Device";
+          deviceType = "WhatsApp Bot"; // Changed from "Unknown Device" to "WhatsApp Bot"
           break;
       }
 
       // Send the device type
-      return await message.send(deviceType);
+      return await message.haki(deviceType);
     } catch (error) {
       console.error(error);
-      return await message.send("An error occurred while determining the device type.");
+      return await message.haki("An error occurred while determining the device type.");
     }
   }
 );
