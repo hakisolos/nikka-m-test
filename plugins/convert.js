@@ -133,7 +133,7 @@ command(
         pattern: "bitly",
         desc: "Shorten a URL using Bitly",
         fromMe: isPrivate,
-        type: "utility",
+        type: "converter",
     },
     async (message, match) => {
         if (!match) {
@@ -156,7 +156,7 @@ command(
         pattern: "qr",
         desc: "Generate a QR code",
         fromMe: isPrivate,
-        type: "utility",
+        type: "converter",
     },
     async (message, match) => {
         const text = match || (message.reply_message ? message.reply_message.text : null);
