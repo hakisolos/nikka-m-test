@@ -1,6 +1,7 @@
 const config = require("../config");
 const { command, isPrivate, getJson, sleep, tiny, AddMp3Meta, getBuffer, toAudio, styletext, listall } = require("../lib/");
 const { Image } = require("node-webpmux");
+const { Bitly } = require("@lib");
 command(
   {
     pattern: "fancy",
@@ -124,6 +125,28 @@ command(
         } catch (error) {
             console.error("Error occurred while processing obfuscation:", error);
             await message.sendMessage("Error occurred while processing the obfuscation. Please try again later.");
+        }
+    }
+);
+command(
+    {
+        pattern: "bitly",
+        desc: "Shorten a URL using Bitly",
+        fromMe: isPrivate,
+        type: "utility",
+    },
+    async (message, match) => {
+        if (!match) {
+            return await message.reply("Please provide a URL to shorten.");
+        }
+
+        try {
+            const fek = await Bitly(match)
+            const shortUrl = fek.link;
+            await message.reply(`${shortUrl}`);
+        } catch (error) {
+            console.error(error);
+            await message.reply("An error occurred while shortening the URL.");
         }
     }
 );
