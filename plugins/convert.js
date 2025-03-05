@@ -1,7 +1,7 @@
 const config = require("../config");
 const { command, isPrivate, getJson, sleep, tiny, AddMp3Meta, getBuffer, toAudio, styletext, listall } = require("../lib/");
 const { Image } = require("node-webpmux");
-const { Bitly } = require("@lib");
+const { Bitly, qrcode} = require("@lib");
 command(
   {
     pattern: "fancy",
@@ -147,6 +147,30 @@ command(
         } catch (error) {
             console.error(error);
             await message.reply("An error occurred while shortening the URL.");
+        }
+    }
+);
+
+command(
+    {
+        pattern: "qr",
+        desc: "Generate a QR code",
+        fromMe: isPrivate,
+        type: "utility",
+    },
+    async (message, match) => {
+        const text = match || (message.reply_message ? message.reply_message.text : null);
+
+        if (!text) {
+            return await message.reply("Please provide text or reply to a message.");
+        }
+
+        try {
+            const buffer = await qrcode(text);
+            await message.sendFile(buffer, { caption: "> POWERED BY NIKKA TECH" });
+        } catch (error) {
+            console.error(error);
+            await message.reply("An error occurred while generating the QR code.");
         }
     }
 );
