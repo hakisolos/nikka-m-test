@@ -176,7 +176,7 @@ command(
 );
 command(
     {
-        pattern: "topng",
+        pattern: "png",
         desc: "Convert image to PNG",
         fromMe: isPrivate,
         type: "converter",
@@ -191,6 +191,36 @@ command(
             if (!mediaUrl) return await message.reply("Failed to upload the image.");
 
             const apiUrl = `https://api.nexoracle.com/converter/image2png?apikey=free_key@maher_apis&img=${encodeURIComponent(mediaUrl)}`;
+            const response = await getJson(apiUrl);
+
+            if (response && response.result) {
+                await message.sendFromUrl(response.result, { caption: "> POWERED BY H4KI XER" });
+            } else {
+                await message.reply("Conversion failed. Please try again.");
+            }
+        } catch (error) {
+            console.error(error);
+            await message.reply("An error occurred while processing your request.");
+        }
+    }
+);
+command(
+    {
+        pattern: "webp",
+        desc: "Convert image to WebP",
+        fromMe: isPrivate,
+        type: "converter",
+    },
+    async (message, match) => {
+        if (!message.reply_message || !message.reply_message.image) {
+            return await message.reply("Reply to an image to convert it to WebP.");
+        }
+
+        try {
+            const mediaUrl = await message.upload(message.reply_message);
+            if (!mediaUrl) return await message.reply("Failed to upload the image.");
+
+            const apiUrl = `https://api.nexoracle.com/converter/image2webp?apikey=free_key@maher_apis&img=${encodeURIComponent(mediaUrl)}`;
             const response = await getJson(apiUrl);
 
             if (response && response.result) {
