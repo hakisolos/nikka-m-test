@@ -29,6 +29,7 @@ command(
     {
         on: "text",
         fromMe: false,
+        dontAddCommandList: true,
     },
     async (message) => {
         const isEnabled = await isChatbotEnabled(message.jid);

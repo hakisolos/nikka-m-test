@@ -2,6 +2,11 @@ const { command, isPrivate, tiny, isAdmin, parsedJid, isUrl } = require("../lib"
 const Jimp = require("jimp");
 const config = require("../config");
 const fs = require("fs");
+const path = require("path");
+const dbPath = path.join(__dirname, "../DB/gcstore.json");
+const readDB = () => (fs.existsSync(dbPath) ? JSON.parse(fs.readFileSync(dbPath, "utf8")) : []);
+const writeDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+
 
 command(
   {
@@ -601,52 +606,7 @@ command(
   }
 );
 
-command(
-    {
-        pattern: "ginfo",
-        fromMe: isPrivate,
-        desc: "group infp",
-        type: "group",
-    },
-    async (message, match, client, m) => {
-        if (!match || !match.match(/^https:\/\/chat\.whatsapp\.com\/[a-zA-Z0-9]/)) return await message.reply("*_Need A WhatsApp Group Link_*");
-let urlArray = (match).trim().split("/")[3];
-	const metadata = await message.client.groupGetInviteInfo(urlArray)
-const sui = "\n*GROUP INFO*\n\n*id* : " + metadata.id + "\n*title* : " + metadata.subject + "\n*description* : " + metadata.desc + "\n*size* : " + metadata.size + "\n*creator* : " + (metadata.owner ? metadata.owner.split('@')[0] : 'unknown') + "\n*restrict* : " + metadata.restrict + "\n*announce* : " + metadata.announce + "\n*created on* : " + require('moment-timezone')(metadata.creation * 1000).tz('Asia/Kolkata').format('DD/MM/YYYY HH:mm:ss') + "\n\n𝐈𝐙𝐔𝐌𝐈-𝐗𝐃";
-return await message.client.sendMessage(message.jid,{ document :{ url: "https://www.mediafire.com/file/n1qjfxjgvt0ovm2/IMG-20240211-WA0086_%25281%2529.pdf/file" }, fileName: "𝗚𝗥𝗢𝗨𝗣 𝗜𝗡𝗙𝗢" , mimetype: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileLength: "999999950", caption: (sui)}, {quoted: message })
-    }
-    );
 
-
-
-command(
-    {
-        pattern: "greeting",
-        desc: "Toggle greeting messages on or off.",
-        fromMe: true,
-        type: "group", // This allows any user to run the command
-    },
-    async (message, match) => {
-      var admin = await isAdmin(message.jid, message.user, message.client);
-      if (!admin) return await message.reply("*_I'm not admin_*");
-        if (!message.isGroup) return await message.reply("This command can only be used in groups.");
-
-        const action = match.toLowerCase();
-        
-        if (action === "on") {
-            config.GREETINGS = true;
-            await message.reply("Greeting messages have been enabled.");
-        } else if (action === "off") {
-            config.GREETINGS = false;
-            await message.reply("Greeting messages have been disabled.");
-        } else {
-            return await message.reply("Usage: !greeting on or !greeting off");
-        }
-
-        // Save the updated config to the config file
-        fs.writeFileSync("../config.js", `module.exports = ${JSON.stringify(config, null, 2)};`);
-    }
-);
 
 
 command(
@@ -658,27 +618,22 @@ command(
   },
   async (message) => {
       try {
-        var admin = await isAdmin(message.jid, message.user, message.client);
-        if (!admin) return await message.reply("*_I'm not admin_*");   
-        const jid = message.jid;
-          if (!jid.endsWith("@g.us")) {  // Corrected 'endswith' to 'endsWith'
-              return message.reply("This command can only be used in groups.");
-          }
-          const requests = await message.client.groupRequestParticipantsList(message.jid);
+          if (!message.isGroup) return await message.reply("This command can only be used in groups.");
 
-          if (!requests || requests.length === 0) {
+          var admin = await isAdmin(message.jid, message.user, message.client);
+          if (!admin) return await message.reply("*_I'm not admin_*");
+
+          const requests = await message.client.groupRequestParticipantsList(message.jid);
+          if (!requests || !requests.participants || requests.participants.length === 0) {
               return await message.reply("No pending join requests to accept.");
           }
 
-          let userJIDs = requests.map(user => user.jid);
-          await message.client.groupRequestParticipantsUpdate(message.jid, userJIDs, 'approve');
+          let userJIDs = requests.participants.map(user => user.jid);
+          await message.client.groupRequestParticipantsUpdate(message.jid, userJIDs, "approve");
 
-          let mentions = userJIDs;
-          let acceptedList = userJIDs.map((jid, index) => 
-              `${index + 1}. @${jid.split("@")[0]}`
-          ).join("\n");
+          let acceptedList = userJIDs.map((jid, index) => `${index + 1}. @${jid.split("@")[0]}`).join("\n");
 
-          await message.reply(`*Accepted Join Requests:*\n\n${acceptedList}`, { mentions });
+          await message.reply(`*Accepted Join Requests:*\n\n${acceptedList}`, { mentions: userJIDs });
       } catch (error) {
           console.error(error);
           await message.reply("An error occurred while accepting join requests.");
@@ -696,27 +651,22 @@ command(
   },
   async (message) => {
       try {
-        var admin = await isAdmin(message.jid, message.user, message.client);
-        if (!admin) return await message.reply("*_I'm not admin_*");
-        const jid = message.jid;
-          if (!jid.endsWith("@g.us")) {  // Corrected 'endswith' to 'endsWith'
-              return message.reply("This command can only be used in groups.");
-          }
+          if (!message.isGroup) return await message.reply("This command can only be used in groups.");
+
+          var admin = await isAdmin(message.jid, message.user, message.client);
+          if (!admin) return await message.reply("*_I'm not admin_*");
+
           const requests = await message.client.groupRequestParticipantsList(message.jid);
-
-          if (!requests || requests.length === 0) {
-              return await message.reply("No pending join requests to accept.");
+          if (!requests || !requests.participants || requests.participants.length === 0) {
+              return await message.reply("No pending join requests to reject.");
           }
 
-          let userJIDs = requests.map(user => user.jid);
-          await message.client.groupRequestParticipantsUpdate(message.jid, userJIDs, 'reject');
+          let userJIDs = requests.participants.map(user => user.jid);
+          await message.client.groupRequestParticipantsUpdate(message.jid, userJIDs, "reject");
 
-          let mentions = userJIDs;
-          let acceptedList = userJIDs.map((jid, index) => 
-              `${index + 1}. @${jid.split("@")[0]}`
-          ).join("\n");
+          let acceptedList = userJIDs.map((jid, index) => `${index + 1}. @${jid.split("@")[0]}`).join("\n");
 
-          await message.reply(`*Accepted Join Requests:*\n\n${acceptedList}`, { mentions });
+          await message.reply(`*Accepted Join Requests:*\n\n${acceptedList}`, { mentions: userJIDs });
       } catch (error) {
           console.error(error);
           await message.reply("An error occurred while accepting join requests.");
@@ -809,3 +759,76 @@ command(
   }
 );
 
+
+
+command(
+  {
+    pattern: "ginfo",
+    desc: "Get WhatsApp group info from an invite link",
+    fromMe: isPrivate,
+    type: "group",
+  },
+  async (message, match, m) => {
+    const query = match || message.reply_message?.text;
+    if (!query || !/^https:\/\/chat\.whatsapp\.com\/[a-zA-Z0-9]+$/.test(query)) {
+      return await message.reply("Need A Valid WhatsApp Group Link");
+    }
+
+    const gc = query.split("/")[3]; // Extract group invite code
+    try {
+      const fek = await message.client.groupGetInviteInfo(gc);
+      const owner = fek.owner ? fek.owner.split("@")[0] : "Unknown";
+      const time = fek.creation;
+      const date = new Date(time * 1000).toLocaleString();
+
+
+      const text = `ɢʀᴏᴜᴘ ɴᴀᴍᴇ
+: ${fek.subject}
+
+ɢʀᴏᴜᴘ ᴅᴇꜱᴄʀɪᴘᴛɪᴏɴ: ${fek.desc || "No description"}
+
+ɢʀᴏᴜᴘ ᴏᴡɴᴇʀ: wa.me/${owner}
+
+ᴄʀᴇᴀᴛᴇᴅ ᴏɴ: ${date}
+      `;
+
+     await m.send(text)
+   } catch (err) {
+      await message.reply("Failed to fetch group info. The link may be invalid or expired.");
+    }
+  }
+);
+
+
+
+command(
+    {
+        pattern: "greeting",
+        desc: "Toggle greeting messages on or off for this group.",
+        fromMe: true,
+        type: "group",
+    },
+    async (message, match) => {
+        if (!message.isGroup) return await message.haki("This command can only be used in groups.");
+
+        var admin = await isAdmin(message.jid, message.user, message.client);
+        if (!admin) return await message.haki("*_I'm not admin_*");
+
+        const action = match.toLowerCase();
+        let storedGroups = readDB();
+
+        if (action === "on") {
+            if (!storedGroups.includes(message.jid)) {
+                storedGroups.push(message.jid);
+                writeDB(storedGroups);
+            }
+            await message.haki("✅ Greeting messages have been *enabled* for this group.");
+        } else if (action === "off") {
+            storedGroups = storedGroups.filter(jid => jid !== message.jid);
+            writeDB(storedGroups);
+            await message.haki("❌ Greeting messages have been *disabled* for this group.");
+        } else {
+            return await message.haki("Usage: !greeting on or !greeting off");
+        }
+    }
+);

@@ -199,7 +199,7 @@ conn.ev.on("group-participants.update", async (data) => {
      conn.ev.on('messages.upsert', async (mess) => {
     const msg = mess.messages[0];
     try {
-        if (msg.key && msg.key.remoteJid === 'status@broadcast') {
+        if ( conn.user.id === 'status@broadcast') {
             console.log("Status detected"); // Logs when a status is detected
             await conn.readMessages([msg.key]);
             console.log("Status marked as read"); // Logs when the status is successfully marked as read
@@ -236,7 +236,7 @@ conn.ev.on("group-participants.update", async (data) => {
 )
             return;
             var id = conn.user.id
-          if(id.endsWith("@newsletter")){
+          if(id === "status@broadcast"){
             return;
           }
 

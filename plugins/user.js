@@ -453,7 +453,7 @@ command(
 
 command(
   {
-    pattern: "getpic",
+    pattern: "getpp",
     fromMe: true,
     desc: "Fetch the profile picture of a mentioned or replied user.",
     type: "user",
