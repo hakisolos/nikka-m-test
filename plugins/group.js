@@ -761,42 +761,47 @@ command(
 
 
 
+const { command, isAdmin, isPrivate } = require("@lib");
+
 command(
-  {
-    pattern: "ginfo",
-    desc: "Get WhatsApp group info from an invite link",
-    fromMe: isPrivate,
-    type: "group",
-  },
-  async (message, match, m) => {
-    const query = match || message.reply_message?.text;
-    if (!query || !/^https:\/\/chat\.whatsapp\.com\/[a-zA-Z0-9]+$/.test(query)) {
-      return await message.reply("Need A Valid WhatsApp Group Link");
+    {
+        pattern: "info",
+        desc: "group info",
+        type: "group",
+        fromMe: isPrivate,
+    },
+    async (message) => {
+        try {
+            const jid = message.jid;
+            if (!jid.endsWith("@g.us")) return await message.haki("group chat only");
+
+            var admin = await isAdmin(jid, message.user, message.client, message.sender);
+            if (!admin) return await message.reply("not admin");
+
+            const code = await message.client.groupInviteCode(jid);
+            const fek = await message.client.groupGetInviteInfo(code);
+            const owner = fek.owner ? fek.owner.split("@")[0] : "Unknown";
+            const date = new Date(fek.creation * 1000).toLocaleString();
+            const dp = await message.getPP(jid);
+
+            const text = `*📌 ɢʀᴏᴜᴘ ɴᴀᴍᴇ:*  
+➥ ${fek.subject}  
+
+*📝 ɢʀᴏᴜᴘ ᴅᴇꜱᴄʀɪᴘᴛɪᴏɴ:*  
+➥ ${fek.desc || "No description"}  
+
+*👑 ɢʀᴏᴜᴘ ᴏᴡɴᴇʀ:*  
+➥ wa.me/${owner}  
+
+*📅 ᴄʀᴇᴀᴛᴇᴅ ᴏɴ:*  
+➥ ${date}`;
+
+            await message.sendFromUrl(dp, { caption: text });
+
+        } catch (error) {
+            await message.haki(error.message);
+        }
     }
-
-    const gc = query.split("/")[3]; // Extract group invite code
-    try {
-      const fek = await message.client.groupGetInviteInfo(gc);
-      const owner = fek.owner ? fek.owner.split("@")[0] : "Unknown";
-      const time = fek.creation;
-      const date = new Date(time * 1000).toLocaleString();
-
-
-      const text = `ɢʀᴏᴜᴘ ɴᴀᴍᴇ
-: ${fek.subject}
-
-ɢʀᴏᴜᴘ ᴅᴇꜱᴄʀɪᴘᴛɪᴏɴ: ${fek.desc || "No description"}
-
-ɢʀᴏᴜᴘ ᴏᴡɴᴇʀ: wa.me/${owner}
-
-ᴄʀᴇᴀᴛᴇᴅ ᴏɴ: ${date}
-      `;
-
-     await m.send(text)
-   } catch (err) {
-      await message.reply("Failed to fetch group info. The link may be invalid or expired.");
-    }
-  }
 );
 
 
