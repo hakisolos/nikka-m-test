@@ -761,11 +761,10 @@ command(
 
 
 
-const { command, isAdmin, isPrivate } = require("@lib");
 
 command(
     {
-        pattern: "info",
+        pattern: "ginfo",
         desc: "group info",
         type: "group",
         fromMe: isPrivate,
