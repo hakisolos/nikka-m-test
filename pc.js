@@ -2,6 +2,7 @@
 const {
   default: makeWASocket,
   useMultiFileAuthState,
+  delay,
   Browsers,
   makeCacheableSignalKeyStore,
   makeInMemoryStore,
@@ -27,37 +28,7 @@ require("events").EventEmitter.defaultMaxListeners = 50;
 const { File } = require("megajs");
 
 (async function () {
-  var prefix = "NIKKA-X";
-  var output = "./lib/session/";
-  var pth = output + "creds.json";
-
-  try {
-    var store = makeInMemoryStore({
-      logger: pino().child({ level: "silent", stream: "store" }),
-    });
-
-    require("events").EventEmitter.defaultMaxListeners = 50;
-
-    if (!fs.existsSync(pth)) {
-      if (!config.SESSION_ID.startsWith(prefix)) {
-        throw new Error("Invalid session id.");
-      }
-
-      var url = "https://mega.nz/file/" + config.SESSION_ID.replace(prefix, "");
-      var file = File.fromURL(url);
-      await file.loadAttributes();
-
-      if (!fs.existsSync(output)) {
-        fs.mkdirSync(output, { recursive: true });
-      }
-
-      var data = await file.downloadBuffer();
-      fs.writeFileSync(pth, data);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-
+  
   fs.readdirSync("./lib/database/").forEach((plugin) => {
     if (path.extname(plugin).toLowerCase() === ".js") {
       require("./lib/database/" + plugin);
