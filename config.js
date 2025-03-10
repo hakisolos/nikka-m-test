@@ -15,6 +15,7 @@ module.exports = {
   LANG: process.env.LANG || "EN",
   HANDLERS: process.env.PREFIX || '^[?]',
   PRESCENCE: process.env.PRESCENCE || "typing",
+  PAIR_NUMBER: process.env.PAIR_NUMBER || "2349112171078",
   GREETINGS: process.env.GREETINGS || false,
   BRANCH: "main",
   WARN_COUNT: 3,

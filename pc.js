@@ -1,100 +1,304 @@
+
 const {
   default: makeWASocket,
   useMultiFileAuthState,
-  makeCacheableSignalKeyStore,
   Browsers,
-} = require("@whiskeysockets/baileys");
+  makeCacheableSignalKeyStore,
+  makeInMemoryStore,
+} = require("haki-baileys");
 const fs = require("fs");
+const { serialize } = require("./lib/serialize");
+const { Message } = require("./lib/Base");
 const pino = require("pino");
-const readline = require("readline");
+const path = require("path");
+const events = require("./lib/event");
+const got = require("got");
+const config = require("./config");
+const { PluginDB } = require("./lib/database/plugins");
+const saveCreds = require("./lib/session");
+require('module-alias/register');
 
-async function startNikka() {
-  console.log("🔹 Checking session...");
 
-  const sessionPath = "./lib/session/";
-  if (!fs.existsSync(sessionPath)) {
-    fs.mkdirSync(sessionPath, { recursive: true });
-  }
+const store = makeInMemoryStore({
+  logger: pino().child({ level: "silent", stream: "store" }),
+});
+require("events").EventEmitter.defaultMaxListeners = 50;
 
-  // ✅ Initialize auth state
-  const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+const { File } = require("megajs");
 
-  // ✅ Initialize retry cache
-  const msgRetryCounterCache = new Map();
+(async function () {
+  var prefix = "NIKKA-X";
+  var output = "./lib/session/";
+  var pth = output + "creds.json";
 
-  // ✅ Establish socket connection
-  const conn = makeWASocket({
-    auth: {
-      creds: state.creds,
-      keys: makeCacheableSignalKeyStore(
-        state.keys,
-        pino({ level: "fatal" }).child({ level: "fatal" })
-      ),
-    },
-    printQRInTerminal: false,
-    logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-    browser: Browsers.macOS("Safari"),
-    markOnlineOnConnect: true,
-    msgRetryCounterCache,
-  });
-
-  // ✅ Check if already logged in
-  if (!conn.authState.creds.registered) {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
+  try {
+    var store = makeInMemoryStore({
+      logger: pino().child({ level: "silent", stream: "store" }),
     });
 
-    const ask = (text) => new Promise((resolve) => rl.question(text, resolve));
+    require("events").EventEmitter.defaultMaxListeners = 50;
 
-    try {
-      let phoneNumber = await ask(
-        "📲 Enter your phone number (with country code, e.g., +2348012345678): "
-      );
-      phoneNumber = phoneNumber.replace(/[^0-9]/g, ""); // Ensure only digits
-      rl.close(); // Close input stream
+    if (!fs.existsSync(pth)) {
+      if (!config.SESSION_ID.startsWith(prefix)) {
+        throw new Error("Invalid session id.");
+      }
 
-      console.log("🔹 Requesting Pairing Code...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const code = await conn.requestPairingCode(phoneNumber);
-      console.log(`✅ Your Pairing Code: ${code?.match(/.{1,4}/g)?.join("-")}`);
-    } catch (error) {
-      console.error("❌ Pairing failed:", error);
+      var url = "https://mega.nz/file/" + config.SESSION_ID.replace(prefix, "");
+      var file = File.fromURL(url);
+      await file.loadAttributes();
+
+      if (!fs.existsSync(output)) {
+        fs.mkdirSync(output, { recursive: true });
+      }
+
+      var data = await file.downloadBuffer();
+      fs.writeFileSync(pth, data);
     }
+  } catch (error) {
+    console.error(error);
   }
 
-  // ✅ Save credentials on update
-  conn.ev.on("creds.update", async () => {
-    await saveCreds();
-    console.log("✅ Credentials saved!");
+  fs.readdirSync("./lib/database/").forEach((plugin) => {
+    if (path.extname(plugin).toLowerCase() === ".js") {
+      require("./lib/database/" + plugin);
+    }
   });
 
-  // ✅ Handle connection updates
-  conn.ev.on("connection.update", async (update) => {
-    const { connection, lastDisconnect } = update;
 
-    if (connection === "connecting") {
-      console.log("⏳ Connecting to WhatsApp...");
-    }
+  try {
 
-    if (connection === "open") {
-      console.log("✅ Login Successful! Bot is now connected.");
-    }
+  } catch (error) {
+    console.error("Failed to initialize store:", error);
+  }
+})();
+async function startNikka() {
+  console.log("Syncing Database");
+  await config.DATABASE.sync();
 
-    if (connection === "close") {
-      if (lastDisconnect?.error?.output?.statusCode === 401) {
-        console.log("❌ Session expired. Please re-pair.");
-        fs.rmSync(sessionPath, { recursive: true, force: true }); // Delete session
-      } else {
-        console.log("🔄 Reconnecting...");
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+  const { state, saveCreds } = await useMultiFileAuthState("./lib/session", {
+      store: true,
+  });
+
+  const conn = makeWASocket({
+      auth: {
+          creds: state.creds,
+          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" })),
+      },
+      msgRetryCounterCache: new Map(),
+      printQRInTerminal: false,
+      logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+      browser: Browsers.macOS("Safari"),
+      markOnlineOnConnect: true,
+  });
+
+  // Function to request pairing code
+  async function requestPairingCode() {
+      if (!conn.authState.creds.registered) {
+          await delay(1500);
+          const num = config.PAIR_NUMBER;
+          const code = await conn.requestPairingCode(num);
+          console.log(`Your code is ${code}`);
+      }
+  }
+
+  // Ensure the pairing code is requested before proceeding
+  await requestPairingCode();
+
+  store.bind(conn.ev);
+
+  setInterval(() => {
+      store.writeToFile("./lib/store_db.json");
+      console.log("saved store");
+  }, 30 * 60 * 1000);
+
+  conn.ev.on("connection.update", async (s) => {
+      const { connection, lastDisconnect } = s;
+
+      if (connection === "connecting") {
+          console.log("please wait...");
+          console.log("processing session id....."); // Now executes AFTER pairing
+      }
+
+
+    if (
+      connection === "close" &&
+      lastDisconnect &&
+      lastDisconnect.error &&
+      lastDisconnect.error.output.statusCode !== 401
+    ) {
+      if (conn?.state?.connection !== "open") {
+        console.log(lastDisconnect.error.output.payload);
         startNikka();
       }
     }
-  });
 
-  return conn;
+    if (connection === "open") {
+      console.log("Login Sucessful ✅");
+      console.log("Installing Plugins 📥");
+
+      let plugins = await PluginDB.findAll();
+      plugins.map(async (plugin) => {
+        if (!fs.existsSync("./plugins/" + plugin.dataValues.name + ".js")) {
+          console.log(plugin.dataValues.name);
+          var response = await got(plugin.dataValues.url);
+          if (response.statusCode === 200) {
+            fs.writeFileSync(
+              "./plugins/" + plugin.dataValues.name + ".js",
+              response.body
+            );
+            require("./plugins/" + plugin.dataValues.name + ".js");
+          }
+        }
+      });
+      console.log("plugins installed ✅");
+
+      fs.readdirSync("./plugins").forEach((plugin) => {
+        if (path.extname(plugin).toLowerCase() === ".js") {
+          require("./plugins/" + plugin);
+        }
+      });
+
+      console.log(" connected  ✅");
+
+      const packageVersion = require("./package.json").version;
+      const totalPlugins = events.commands.length;
+      const workType = config.WORK_TYPE;
+      const statusMessage = `ׂNikka x md connected  ✅\n ׂᴠᴇʀsɪᴏɴ: ${packageVersion}\n ׂᴄᴍᴅs: ${totalPlugins}\n ׂᴡᴏʀᴋᴛʏᴘᴇ: ${workType}\n ׂ𝗺𝗮𝗱𝗲 𝘄𝗶𝘁𝗵 ❤️ 𝗯𝘆 𝗵𝗮𝗸𝗶`;
+
+      await conn.sendMessage(conn.user.id, {text: statusMessage})
+    }
+
+    try {
+      conn.ev.on("creds.update", saveCreds);
+
+      conn.ev.removeAllListeners("group-participants.update");
+conn.ev.on("group-participants.update", async (data) => {
+    try {
+        const metadata = await conn.groupMetadata(data.id);
+        const groupName = metadata.subject;
+
+        if (config.GREETINGS) {
+            if (data.action === "add") {
+                for (const participant of data.participants) {
+                    const ppUrl = await conn.profilePictureUrl(participant, "image").catch(() => null);
+                    const welcomeMessage = `Hello @${participant.split("@")[0]}, welcome to *${groupName}*! 🎉\nFeel free to introduce yourself and enjoy your stay.`;
+
+                    await conn.sendMessage(data.id, {
+                        image: { url: ppUrl || "https://files.catbox.moe/placeholder.png" },
+                        caption: welcomeMessage,
+                        mentions: [participant],
+                    });
+                }
+            } else if (data.action === "remove") {
+                for (const participant of data.participants) {
+                    const ppUrl = await conn.profilePictureUrl(participant, "image").catch(() => null);
+                    const goodbyeMessage = `Goodbye @${participant.split("@")[0]}, we’ll miss you from *${groupName}*. 😢`;
+
+                    await conn.sendMessage(data.id, {
+                        image: { url: ppUrl || "https://files.catbox.moe/placeholder.png" },
+                        caption: goodbyeMessage,
+                        mentions: [participant],
+                    });
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Error in group-participants.update handler:", error);
+    }
+});
+      conn.ev.removeAllListeners("messages.upsert");
+     conn.ev.on('messages.upsert', async (mess) => {
+    const msg = mess.messages[0];
+    try {
+        if ( conn.user.id === 'status@broadcast') {
+            console.log("Status detected"); // Logs when a status is detected
+            await conn.readMessages([msg.key]);
+            console.log("Status marked as read"); // Logs when the status is successfully marked as read
+        }
+    } catch (error) {
+        console.error("Failed to mark status message as read:", error);
+    }
+});
+
+
+      conn.ev.removeAllListeners("messages.upsert");
+      conn.ev.on("messages.upsert", async (m) => {
+        if (m.type !== "notify") return;
+        let ms = m.messages[0];
+        let msg = await serialize(JSON.parse(JSON.stringify(ms)), conn);
+
+        if (!msg.message) return;
+
+        let text_msg = msg.body;
+        if (text_msg && config.LOGS) {
+          console.log(
+            `At : ${
+              msg.from.endsWith("@g.us")
+                ? (await conn.groupMetadata(msg.from)).subject
+                : msg.from
+            }\nFrom : ${msg.sender}\nMessage:${text_msg}`
+          );
+        }
+
+        events.commands.map(async (command) => {
+          if (
+  command.fromMe &&
+  !config.SUDO.includes(msg.sender?.split("@")[0] || !msg.isSelf)
+)
+            return;
+            var id = conn.user.id
+          if(id === "status@broadcast"){
+            return;
+          }
+
+          let comman;
+          if (text_msg) {
+            comman = text_msg.trim().split(/ +/)[0];
+            const handlerRegex = new RegExp(
+              `^(${config.HANDLERS.split("").map(h => h.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")).join("|")})`);            
+            msg.prefix = handlerRegex.test(text_msg) ? text_msg.charAt(0) : ",";
+          }
+
+
+          if (command.pattern && command.pattern.test(comman)) {
+            var match;
+            try {
+              await conn.sendMessage(msg.key.remoteJid, {
+  react: { text: "⏳️", key: msg.key },
+});
+              match = text_msg.replace(new RegExp(`^\\${comman}\\s*`, "i"), "").trim();
+
+            } catch {
+              match = false;
+            }
+
+            whats = new Message(conn, msg, ms);
+            command.function(whats, match, msg, conn);
+            
+          } else if (text_msg && command.on === "text") {
+            whats = new Message(conn, msg, ms);
+            command.function(whats, text_msg, msg, conn, m);
+          }
+        });
+      });
+    } catch (e) {
+      await conn.sendMessage(msg.sender, {text: e })
+      console.log(e.stack + "\n\n\n\n\n" + JSON.stringify(msg));
+    }
+  });
+ 
+
+
+
+
+  process.on("uncaughtException", async (err) => {
+    //let error = err.message;
+    //console.log(err);*
+    await conn.sendMessage(conn.user.id, { text: error });
+  });
 }
 
-// Start the bot
-startNikka();
+
+setTimeout(() => {
+  startNikka();
+}, 3000);
