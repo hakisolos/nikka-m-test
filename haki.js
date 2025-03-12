@@ -264,10 +264,48 @@ conn.ev.on("group-participants.update", async (data) => {
             whats = new Message(conn, msg, ms);
             command.function(whats, match, msg, conn);
             
-          } else if (text_msg && command.on === "text") {
-            whats = new Message(conn, msg, ms);
-            command.function(whats, text_msg, msg, conn, m);
-          }
+          } if (command.on) {
+  let whats = new Message(conn, msg, ms);
+
+  switch (command.on) {
+    case "text":
+      if (text_msg) command.function(whats, text_msg, msg, conn, m);
+      break;
+
+    case "image":
+      if (msg.message?.imageMessage) 
+        command.function(whats, msg.message.imageMessage, msg, conn, m);
+      break;
+
+    case "video":
+      if (msg.message?.videoMessage) 
+        command.function(whats, msg.message.videoMessage, msg, conn, m);
+      break;
+
+    case "audio":
+      if (msg.message?.audioMessage) 
+        command.function(whats, msg.message.audioMessage, msg, conn, m);
+      break;
+
+    case "sticker":
+      if (msg.message?.stickerMessage) 
+        command.function(whats, msg.message.stickerMessage, msg, conn, m);
+      break;
+
+    case "document":
+      if (msg.message?.documentMessage) 
+        command.function(whats, msg.message.documentMessage, msg, conn, m);
+      break;
+
+    case "reaction":
+      if (msg.message?.reactionMessage) 
+        command.function(whats, msg.message.reactionMessage, msg, conn, m);
+      break;
+
+    case "status":
+      if (msg.key.remoteJid === "status@broadcast" && msg.message) 
+        command.function(whats, msg, conn, m);
+      break;
         });
       });
     } catch (e) {
