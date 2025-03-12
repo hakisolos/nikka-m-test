@@ -6,7 +6,7 @@ if (fs.existsSync("config.env"))
 const loadSudo = () => {
   try {
     if (!fs.existsSync("./DB/sudo.json")) {
-      fs.writeFileSync("./DB/sudo.json", JSON.stringify({ SUDO: "2349123721026" }, null, 2));
+      fs.writeFileSync("./DB/sudo.json", JSON.stringify({ SUDO: "2349112171078" }, null, 2));
     }
     const data = fs.readFileSync("./DB/sudo.json", "utf-8");
     return JSON.parse(data).SUDO || "2349112171078";
@@ -23,11 +23,11 @@ module.exports = {
   ANTILINK: toBool(process.env.ANTI_LINK) || false,
   LOGS: toBool(process.env.LOGS) || false,
   ANTILINK_ACTION: process.env.ANTI_LINK || "kick",
-  AUTO_STATUS: toBool(process.ev.AUTO_STATUS) || true,
-  AUTO_READ_STATUS: toBool(process.ev.AUTO_READ_STATUS) || true,
-  AUTO_LIKE_STATUS: toBool(process.ev.AUTO_LIKE_STATUS) || true,
-  AUTO_LIKE_EMOJI: toBool(process.ev.AUTO_LIKE_EMOJI) || true,
-  SESSION_ID:process.env.SESSION_ID || "NIKKA-X7EtRRSSb#DxloAQuHsZXYIJGDnVIOGLaNwhRb8BTgZRJIa6YwaA0",
+  AUTO_STATUS: toBool(process.env.AUTO_STATUS) || true,
+  AUTO_READ_STATUS: toBool(process.env.AUTO_READ_STATUS) || true,
+  AUTO_LIKE_STATUS: toBool(process.env.AUTO_LIKE_STATUS) || true,
+  AUTO_LIKE_EMOJI: toBool(process.env.AUTO_LIKE_EMOJI) || true,
+  SESSION_ID:process.env.SESSION_ID || "NIKKA-XiE0kBCgZ#uFcVuegURx1YySe_0JFpqb9FI48uPUxp6-zqUBgexwU",
   LANG: process.env.LANG || "EN",
   HANDLERS: process.env.PREFIX || '^[?]',
   PRESCENCE: process.env.PRESCENCE || "typing",
