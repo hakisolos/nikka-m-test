@@ -211,117 +211,112 @@ conn.ev.on("group-participants.update", async (data) => {
 
 
       conn.ev.removeAllListeners("messages.upsert");
-conn.ev.on("messages.upsert", async (m) => {
-  if (m.type !== "notify") return;
-  let ms = m.messages[0];
-  let msg = await serialize(JSON.parse(JSON.stringify(ms)), conn);
+      conn.ev.on("messages.upsert", async (m) => {
+        if (m.type !== "notify") return;
+        let ms = m.messages[0];
+        let msg = await serialize(JSON.parse(JSON.stringify(ms)), conn);
 
-  if (!msg.message) return;
+        if (!msg.message) return;
 
-  let text_msg = msg.body;
-  if (text_msg && config.LOGS) {
-    console.log(
-      `At : ${
-        msg.from.endsWith("@g.us")
-          ? (await conn.groupMetadata(msg.from)).subject
-          : msg.from
-      }\nFrom : ${msg.sender}\nMessage:${text_msg}`
-    );
-  }
+        let text_msg = msg.body;
+        if (text_msg && config.LOGS) {
+          console.log(
+            `At : ${
+              msg.from.endsWith("@g.us")
+                ? (await conn.groupMetadata(msg.from)).subject
+                : msg.from
+            }\nFrom : ${msg.sender}\nMessage:${text_msg}`
+          );
+        }
 
-  events.commands.forEach(async (command) => { // Changed .map() to .forEach()
-    if (
-      command.fromMe &&
-      !config.SUDO.includes(msg.sender?.split("@")[0]) &&
-      !msg.isSelf
-    )
-      return;
+        events.commands.map(async (command) => {
+          if (
+  command.fromMe &&
+  !config.SUDO.includes(msg.sender?.split("@")[0] || !msg.isSelf)
+)
+            return;
+            var id = conn.user.id
+          if(id === "status@broadcast"){
+            return;
+          }
 
-    var id = conn.user.id;
-    if (id === "status@broadcast") return;
+          let comman;
+          if (text_msg) {
+            comman = text_msg.trim().split(/ +/)[0];
+            const handlerRegex = new RegExp(
+              `^(${config.HANDLERS.split("").map(h => h.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")).join("|")})`);            
+            msg.prefix = handlerRegex.test(text_msg) ? text_msg.charAt(0) : ",";
+          }
 
-    let comman;
-    if (text_msg) {
-      comman = text_msg.trim().split(/ +/)[0];
-      const handlerRegex = new RegExp(
-        `^(${config.HANDLERS.split("")
-          .map((h) => h.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"))
-          .join("|")})`
-      );
-      msg.prefix = handlerRegex.test(text_msg) ? text_msg.charAt(0) : ",";
-    }
 
-    if (command.pattern && command.pattern.test(comman)) {
-      var match;
-      try {
-        await conn.sendMessage(msg.key.remoteJid, {
-          react: { text: "⏳️", key: msg.key },
-        });
-
-        match = text_msg
-          ? text_msg.replace(new RegExp(`^\\${comman}\\s*`, "i"), "").trim()
-          : "";
-      } catch(e) {
-        match = false;
-      }
-
-      let whats = new Message(conn, msg, ms);
-      command.function(whats, match, msg, conn);
-    }
-
-    if (command.on) {
-      let whats = new Message(conn, msg, ms);
-
-      switch (command.on) {
-        case "text":
-          if (text_msg) command.function(whats, text_msg, msg, conn);
-          break;
-
-        case "image":
-          if (msg.message?.imageMessage)
-            command.function(whats, msg.message.imageMessage, msg, conn);
-          break;
-
-        case "video":
-          if (msg.message?.videoMessage)
-            command.function(whats, msg.message.videoMessage, msg, conn);
-          break;
-
-        case "audio":
-          if (msg.message?.audioMessage)
-            command.function(whats, msg.message.audioMessage, msg, conn);
-          break;
-
-        case "sticker":
-          if (msg.message?.stickerMessage)
-            command.function(whats, msg.message.stickerMessage, msg, conn);
-          break;
-
-        case "document":
-          if (msg.message?.documentMessage)
-            command.function(whats, msg.message.documentMessage, msg, conn);
-          break;
-
-        case "reaction":
-          if (msg.message?.reactionMessage)
-            command.function(whats, msg.message.reactionMessage, msg, conn);
-          break;
-
-        case "status":
-          if (msg.key.remoteJid === "status@broadcast" && msg.message)
-            command.function(whats, msg, conn);
-          break;
-      }
-    }
-  }); // End of forEach()
-
-}); // <-- Properly closed `conn.ev.on()`
-    
-// Handle errors
-process.on("uncaughtException", async (err) => {
-  await conn.sendMessage(conn.user.id, { text: err.message });
-  console.log(err.stack);
+          if (command.pattern && command.pattern.test(comman)) {
+            var match;
+            try {
+              await conn.sendMessage(msg.key.remoteJid, {
+  react: { text: "⏳️", key: msg.key },
 });
+              match = text_msg.replace(new RegExp(`^\\${comman}\\s*`, "i"), "").trim();
+
+            } catch {
+              match = false;
+            }
+
+            whats = new Message(conn, msg, ms);
+            command.function(whats, match, msg, conn);
+            
+          } 
+          if(command.on){
+            let whats = new Message(conn, msg, ms);
+            switch (command.on){
+              case "text":
+                if(text_msg) command.function(whats, text_msg, msg, conn, m);
+                break;
+              case "image":
+                if(msg.message?.imageMessage) command.function(whats, msg.message.imageMessage, msg, conn, m);
+                break;
+              case "video":
+                if(msg.message?.videoMessage) command.function(whats, msg.message.videoMessage, msg, conn, m);
+                break;
+              case "audio":
+                if(msg.message?.audioMessage) command.function(whats, msg.message.audioMessage, msg, conn, m);
+                break;
+              case "sticker":
+                if(msg.message?.stickerMessage) command.function(whats, msg.message.stickerMessage, msg, conn, m);
+                break;
+              case "document":
+                if (msg.message?.documentMessage) 
+                  command.function(whats, msg.message.documentMessage, msg, conn, m);
+                break;
+              case "reaction":
+                if (msg.message?.reactionMessage) 
+                  command.function(whats, msg.message.reactionMessage, msg, conn, m);
+                break;
+
+              case "status":
+                if (msg.key.remoteJid === "status@broadcast" && msg.message) 
+                  command.function(whats, msg, conn, m);
+                break;
+            }
+          }
+        });
+      });
+    } catch (e) {
+      await conn.sendMessage(msg.sender, {text: e })
+      console.log(e.stack + "\n\n\n\n\n" + JSON.stringify(msg));
+    }
+  });
+ 
+
+
+
+
+  process.on("uncaughtException", async (err) => {
+    //let error = err.message;
+    //console.log(err);*
+    await conn.sendMessage(conn.user.id, { text: error });
+  });
+}
+
 
 setTimeout(() => {
   startNikka();
