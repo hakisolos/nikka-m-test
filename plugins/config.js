@@ -1,7 +1,7 @@
 const { command } = require("../lib");
 const fs = require("fs");
 const path = require("path");
-const tiny = require("../lib/fancy_font/fancy");
+const {tiny} = require("../lib/fancy_font/fancy");
 
 const sudoFilePath = path.join(__dirname, "../DB/sudo.json");
 
