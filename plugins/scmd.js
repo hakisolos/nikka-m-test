@@ -1,84 +1,159 @@
-/*
-const fs = require('fs');
-const path = require('path');
-const { command } = require("../lib");
+const { commands } = require("../lib/event");
+const { command, isPrivate } = require("../lib/");
+const fs = require("fs");
+const path = require("path");
+const config = require("../config");
+const hand = config.HANDLERS[2];
+const stickerCommandsPath = path.join(__dirname, "../DB/sticker_commands.json");
+const {tiny} = require("../lib/fancy_font/fancy")
 
-const storePath = path.join(__dirname, 'sticker_cmds.json');
+const loadStickerCommands = () => {
+  if (!fs.existsSync(stickerCommandsPath)) return {};
+  return JSON.parse(fs.readFileSync(stickerCommandsPath));
+};
 
-// Ensure JSON file exists
-if (!fs.existsSync(storePath)) {
-    fs.writeFileSync(storePath, JSON.stringify({}));
-}
+const saveStickerCommands = (data) => {
+  fs.writeFileSync(stickerCommandsPath, JSON.stringify(data, null, 2));
+};
 
-// Read and write functions
-const readDB = () => JSON.parse(fs.readFileSync(storePath, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(storePath, JSON.stringify(data, null, 2));
+const getStickerCommand = (stickerHash) => {
+  if (!stickerHash) return null;
+  const stickerCommands = loadStickerCommands();
+  return stickerCommands[stickerHash] || null;
+};
 
-// Set Sticker Command
-async function setStickerCommand(stickerSha, command) {
-    const data = readDB();
-    data[stickerSha] = `.${command}`;  // Save with a prefix like .ping
-    writeDB(data);
-    return { stickerSha, command };
-}
-
-// Get Sticker Command
-async function getStickerCommand(stickerSha) {
-    const data = readDB();
-    return data[stickerSha] || null;
-}
-
-// Delete Sticker Command
-async function delStickerCommand(stickerSha) {
-    const data = readDB();
-    if (data[stickerSha]) {
-        delete data[stickerSha];
-        writeDB(data);
-        return true;
-    }
-    return false;
-}
-
-// Command to set a sticker command
 command(
-    {
-        pattern: "setcmd",
-        desc: "Set a sticker command",
-        fromMe: true,
-        type: "sticker",
-    },
-    async (message, match, m) => {
-        if (!m.quoted || m.quoted.mtype !== "stickerMessage")
-            return await message.reply("Reply to a sticker with `.setcmd <command>`");
+  {
+    pattern: "setcmd",
+    fromMe: true,
+    desc: "Bind a command to a sticker",
+    type: "sticker-cmd",
+  },
+  async (message, match, m) => {
+    if (!m.quoted) return await message.reply(tiny("Reply to a sticker with a command"));
+    if (!m.quoted.message?.stickerMessage?.fileSha256) return await message.reply(tiny("Reply to a valid sticker"));
+    if (!match) return await message.reply(tiny("Provide a command to bind to this sticker"));
 
-        if (!match) return await message.reply("Provide a command name!");
+    try {
+      const stickerHash = m.quoted.message.stickerMessage.fileSha256.toString("base64");
+      const stickerCommands = loadStickerCommands();
+      const commandName = match.trim().toLowerCase();
 
-        const stickerSha = m.quoted.message.stickerMessage.fileSha256.toString('base64');
-        await setStickerCommand(stickerSha, match);
+      stickerCommands[stickerHash] = commandName;
+      saveStickerCommands(stickerCommands);
 
-        await message.reply(`✅ Sticker command set! Now sending this sticker will trigger \`.${match}\``);
+      await message.reply(tiny(`✅ Command set successfully!\n📌 Sticker now triggers: ${commandName}`));
+    } catch (error) {
+      console.error(error);
+      await message.reply(tiny("Failed to bind command to sticker"));
     }
+  }
 );
 
-// Command to trigger when a sticker is sent
 command(
-    {
-        on: "sticker",
-        fromMe: false,
-    },
-    async (message, m, client) => {
-        if (message.mtype !== "stickerMessage") return;
+  {
+    pattern: "listcmd",
+    fromMe: true,
+    desc: "List all bound sticker commands",
+    type: "sticker-cmd",
+  },
+  async (message) => {
+    const stickerCommands = loadStickerCommands();
+    if (Object.keys(stickerCommands).length === 0) return await message.reply(tiny("No sticker commands set yet!"));
 
-        const stickerSha = message.message.stickerMessage.fileSha256.toString('base64');
-        const command = await getStickerCommand(stickerSha);
+    let msg = "Sticker Commands List:\n\n";
+    for (const [hash, cmd] of Object.entries(stickerCommands)) {
+      msg += `🔹 Sticker Hash: ${hash.slice(0, 10)}...\n⚡ Command: ${cmd}\n\n`;
+    }
 
-        if (command) {
-            // Simulate the command execution as if the user typed it
-            message.text = command;
-            return command({ pattern: command.replace('.', ''), fromMe: false }, message, "", client);
+    await message.reply(tiny(msg));
+  }
+);
+
+command(
+  {
+    pattern: "delcmd",
+    fromMe: isPrivate,
+    desc: "Remove a bound command from a sticker",
+    type: "sticker-cmd",
+  },
+  async (message, _, m) => {
+    if (!m.quoted) return await message.reply(tiny("Reply to a sticker to remove its command"));
+    if (!m.quoted.message?.stickerMessage?.fileSha256) return await message.reply(tiny("Reply to a valid sticker"));
+
+    try {
+      const stickerHash = m.quoted.message.stickerMessage.fileSha256.toString("base64");
+      const stickerCommands = loadStickerCommands();
+
+      if (!stickerCommands[stickerHash]) return await message.reply(tiny("No command found for this sticker"));
+
+      delete stickerCommands[stickerHash];
+      saveStickerCommands(stickerCommands);
+
+      await message.reply(tiny("✅ Sticker command removed successfully!"));
+    } catch (error) {
+      console.error(error);
+      await message.reply(tiny("Failed to unbind command from sticker"));
+    }
+  }
+);
+
+command(
+  {
+    pattern: "clearcmd",
+    fromMe: isPrivate,
+    desc: "Delete all sticker commands",
+    type: "sticker-cmd",
+  },
+  async (message) => {
+    try {
+      saveStickerCommands({});
+      await message.reply(tiny("✅ All sticker commands deleted successfully!"));
+    } catch (error) {
+      console.error(error);
+      await message.reply(tiny("Failed to delete sticker commands"));
+    }
+  }
+);
+
+command(
+  {
+    on: "sticker",
+  },
+  async (message, _, m, conn) => {
+    try {
+      if (!m.message?.stickerMessage?.fileSha256) return;
+
+      const stickerHash = m.message.stickerMessage.fileSha256.toString("base64");
+      const commandName = getStickerCommand(stickerHash);
+      if (!commandName) return;
+
+      console.log("Sticker triggered command:", commandName);
+
+      const pluginss = require("../lib/event");
+      const allCommands = await pluginss.commands || commands;
+
+      let targetCommand = null;
+      for (const cmd of allCommands) {
+        if (!cmd.pattern) continue;
+        if (cmd.pattern.toString().toLowerCase().includes(commandName)) {
+          targetCommand = cmd;
+          break;
         }
+      }
+
+      if (targetCommand) {
+        console.log("Found matching command:", targetCommand.pattern);
+        const fakeMessage = { ...m, body: `${hand}${commandName}` };
+        let whats = new (require("../lib/Base.js").Message)(conn, fakeMessage, fakeMessage);
+        await targetCommand.function(whats, "", fakeMessage, conn);
+      } else {
+        console.log("No matching command found for:", commandName);
+        await message.reply(tiny(`❌ Command not found: ${commandName}`));
+      }
+    } catch (error) {
+      console.error("Sticker command execution error:", error);
+      await message.reply(tiny(`Error: ${error.message}`));
     }
+  }
 );
-
-
-*/
