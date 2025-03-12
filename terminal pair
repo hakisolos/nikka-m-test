@@ -1,11 +1,140 @@
-var rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
-var ask = (text) => new Promise((resolve) => rl.question(text, resolve));
+if (command.on) {
+  let whats = new King(conn, msg, ms);
 
-if (!sock.authState.creds.registered) {
-		var ph = await ask("Enter Number: ");
-		var code = await sock.requestPairingCode(ph);
-		console.log(`CODE : ${code}`);
-	}
+  switch (command.on) {
+    case "text":
+      if (text_msg) command.function(whats, text_msg, msg, conn, m);
+      break;
+
+    case "image":
+      if (msg.message?.imageMessage) 
+        command.function(whats, msg.message.imageMessage, msg, conn, m);
+      break;
+
+    case "video":
+      if (msg.message?.videoMessage) 
+        command.function(whats, msg.message.videoMessage, msg, conn, m);
+      break;
+
+    case "audio":
+      if (msg.message?.audioMessage) 
+        command.function(whats, msg.message.audioMessage, msg, conn, m);
+      break;
+
+    case "sticker":
+      if (msg.message?.stickerMessage) 
+        command.function(whats, msg.message.stickerMessage, msg, conn, m);
+      break;
+
+    case "document":
+      if (msg.message?.documentMessage) 
+        command.function(whats, msg.message.documentMessage, msg, conn, m);
+      break;
+
+    case "reaction":
+      if (msg.message?.reactionMessage) 
+        command.function(whats, msg.message.reactionMessage, msg, conn, m);
+      break;
+
+    case "status":
+      if (msg.key.remoteJid === "status@broadcast" && msg.message) 
+        command.function(whats, msg, conn, m);
+      break;
+      
+      
+      
+const { command } = require("../lib/");
+const config = require("../config");
+const { jidNormalizedUser } = require("@whiskeysockets/baileys"); // Import this
+
+// Ensure settings exist in config
+if (typeof config.AUTO_STATUS === "undefined") config.AUTO_STATUS = true; // Global switch
+if (typeof config.AUTO_READ_STATUS === "undefined") config.AUTO_READ_STATUS = false;
+if (typeof config.AUTO_LIKE_STATUS === "undefined") config.AUTO_LIKE_STATUS = false;
+if (typeof config.AUTO_LIKE_EMOJI === "undefined") config.AUTO_LIKE_EMOJI = "✨";
+
+// Command to toggle Auto Read & Auto Like Status
+command(
+  {
+    pattern: "autostatus",
+    fromMe: true, // Only owner can toggle
+    desc: "Toggle Auto Status Features",
+    type: "config",
+  },
+  async (king, match) => {
+    const args = match.split(" ");
+
+    if (args[0] === "off") {
+      config.AUTO_STATUS = false;
+      return await king.reply(`❌ *Auto Status Features Disabled* ❌`);
+    }
+
+    if (args[0] === "on") {
+      config.AUTO_STATUS = true;
+      return await king.reply(`✅ *Auto Status Features Enabled* ✅`);
+    }
+
+    if (args[0] === "read") {
+      config.AUTO_READ_STATUS = !config.AUTO_READ_STATUS;
+      return await king.reply(`✅ *Auto Read Status is now* ${config.AUTO_READ_STATUS ? "ON ✅" : "OFF ❌"}`);
+    }
+
+    if (args[0] === "like") {
+      config.AUTO_LIKE_STATUS = !config.AUTO_LIKE_STATUS;
+      return await king.reply(`✅ *Auto Like Status is now* ${config.AUTO_LIKE_STATUS ? "ON ✅" : "OFF ❌"}`);
+    }
+
+    if (args[0] === "emoji" && args[1]) {
+      config.AUTO_LIKE_EMOJI = args[1];
+      return await king.reply(`✅ *Auto Like Emoji set to:* ${args[1]}`);
+    }
+
+    return await king.reply(
+      "*Usage:*\n" +
+      "`.autostatus on` - Enable Auto Status Features\n" +
+      "`.autostatus off` - Disable Auto Status Features\n" +
+      "`.autostatus read` - Toggle Auto Read Status\n" +
+      "`.autostatus like` - Toggle Auto Like Status\n" +
+      "`.autostatus emoji <emoji>` - Set Auto Like Emoji"
+    );
+  }
+);
+
+// Auto Read & Auto Like Status Function
+command(
+  {
+    on: "status",
+  },
+  async (king, message) => {
+    try {
+      if (!config.AUTO_STATUS) return; // Global switch
+
+      if (config.AUTO_READ_STATUS && message.key) {
+        const botJid = jidNormalizedUser(king.client.user.id);
+        await king.client.readMessages([message.key]);
+      }
+
+      if (config.AUTO_LIKE_STATUS) {
+        const botJid = jidNormalizedUser(king.client.user.id);
+        const customEmoji = config.AUTO_LIKE_EMOJI || "✨";
+
+        if (message.key.remoteJid && message.key.participant) {
+          await king.client.sendMessage(
+            message.key.remoteJid,
+            {
+              react: {
+                key: message.key,
+                text: customEmoji,
+              },
+            },
+            {
+              statusJidList: [message.key.participant, botJid],
+            }
+          );
+        }
+      }
+    } catch (error) {
+      console.error("❌ Error processing status actions:", error);
+    }
+  }
+);
