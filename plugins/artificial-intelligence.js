@@ -1,6 +1,65 @@
 const { command, isPrivate } = require("@lib");
 const { gemini, maths, you, groq, meta,  flux, blackbox, llama, dalle, gpt, hakiu, nikka, claude, jeevs, shaka } = require("@ai");
 
+const fetch = require("node-fetch");
+const {tiny} = require("../lib/fancy_font/fancy");
+async function sendJsonToApi(jsonPayload) {
+    try {
+        const res = await fetch("https://fastrestapis.fasturl.cloud/aillm/gemini/image", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(jsonPayload),
+        });
+
+        if (!res.ok) {
+            throw new Error(`API request failed with status ${res.status}: ${res.statusText}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Error sending JSON to API:", error);
+        throw new Error("Failed to send JSON to API.");
+    }
+}
+
+command(
+    {
+        pattern: "shanky",
+        fromMe: true,
+        desc: "Reply to a media message (sticker, image) to upload it and send a query to the API.",
+        type: "ai",
+    },
+    async (message, match) => {
+        if (!message.reply_message)
+            return await message.reply("*_Reply to a media message to upload it_*");
+
+        try {
+            const uploadedUrl = await message.upload(message.reply_message);
+
+            if (!uploadedUrl) {
+                return await message.reply("*_Failed to upload the media file._*");
+            }
+
+            const jsonPayload = {
+                ask: match,
+                image: uploadedUrl,
+            };
+
+            const apiResponse = await sendJsonToApi(jsonPayload);
+
+            if (apiResponse.status === 200) {
+                await message.reply(tiny(`${apiResponse.result}`));
+            } else {
+                await message.reply(`*_API Error: ${apiResponse.content}_*`);
+            }
+        } catch (error) {
+            console.error('[ERROR]', error);
+            await message.reply("*_An error occurred while processing your request._*");
+        }
+    }
+);
 
 
 
