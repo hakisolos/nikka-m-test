@@ -93,7 +93,7 @@ command(
   async (message) => {
     let sudoList = getSudoList();
     return await message.reply(
-      tiny(`👑 **SUDO Users:**\n${sudoList.length ? sudoList.join("\n") : "No sudo users found."}`)
+      tiny(` **sudo users:**\n${sudoList.length ? sudoList.join("\n") : "No sudo users found."}`)
     );
   }
 );
