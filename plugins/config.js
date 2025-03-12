@@ -85,7 +85,7 @@ command(
 
 command(
   {
-    pattern: "listsudo",
+    pattern: "getsudo",
     fromMe: true,
     desc: "List all sudo users",
     type: "owner",
