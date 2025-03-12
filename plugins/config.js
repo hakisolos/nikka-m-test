@@ -36,7 +36,7 @@ command(
     pattern: "setsudo",
     fromMe: true,
     desc: "Add a number to sudo list",
-    type: "owner",
+    type: "config",
   },
   async (message) => {
     let match = message.reply_message?.jid || message.mention?.[0];
