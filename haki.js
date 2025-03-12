@@ -30,7 +30,7 @@ const { File } = require("megajs");
   var prefix = "NIKKA-X";
   var output = "./lib/session/";
   var pth = output + "creds.json";
-
+// hdhshsus
   try {
     var store = makeInMemoryStore({
       logger: pino().child({ level: "silent", stream: "store" }),
