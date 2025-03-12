@@ -15,9 +15,6 @@ const loadSudo = () => {
     return "2349112171078";
   }
 };
-
-
-
 const toBool = (x) => x == "true";
 //==================================================================================================================================================
 DATABASE_URL = process.env.DATABASE_URL || "./lib/database.db";
@@ -30,7 +27,7 @@ module.exports = {
   AUTO_READ_STATUS: toBool(process.ev.AUTO_READ_STATUS) || true,
   AUTO_LIKE_STATUS: toBool(process.ev.AUTO_LIKE_STATUS) || true,
   AUTO_LIKE_EMOJI: toBool(process.ev.AUTO_LIKE_EMOJI) || true,
-  SESSION_ID:process.env.SESSION_ID || "",
+  SESSION_ID:process.env.SESSION_ID || "NIKKA-X7EtRRSSb#DxloAQuHsZXYIJGDnVIOGLaNwhRb8BTgZRJIa6YwaA0",
   LANG: process.env.LANG || "EN",
   HANDLERS: process.env.PREFIX || '^[?]',
   PRESCENCE: process.env.PRESCENCE || "typing",
