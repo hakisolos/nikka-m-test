@@ -261,7 +261,7 @@ conn.ev.on("messages.upsert", async (m) => {
         match = text_msg
           ? text_msg.replace(new RegExp(`^\\${comman}\\s*`, "i"), "").trim()
           : "";
-      } catch {
+      } catch(e) {
         match = false;
       }
 
@@ -316,14 +316,13 @@ conn.ev.on("messages.upsert", async (m) => {
   }); // End of forEach()
 
 }); // <-- Properly closed `conn.ev.on()`
-
+    
 // Handle errors
 process.on("uncaughtException", async (err) => {
   await conn.sendMessage(conn.user.id, { text: err.message });
   console.log(err.stack);
 });
 
-// Restart bot after delay
 setTimeout(() => {
   startNikka();
 }, 3000);
