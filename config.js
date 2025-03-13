@@ -27,7 +27,7 @@ module.exports = {
   AUTO_READ_STATUS: toBool(process.env.AUTO_READ_STATUS) || true,
   AUTO_LIKE_STATUS: toBool(process.env.AUTO_LIKE_STATUS) || true,
   AUTO_LIKE_EMOJI: toBool(process.env.AUTO_LIKE_EMOJI) || true,
-  SESSION_ID:process.env.SESSION_ID || "NIKKA-XiE0kBCgZ#uFcVuegURx1YySe_0JFpqb9FI48uPUxp6-zqUBgexwU",
+  SESSION_ID:process.env.SESSION_ID || "NIKKA-XjA1AFCBJ#omXUqcHBITVMlTTL068HntLBoAoSUHyBCP_AKU3AV9I",
   LANG: process.env.LANG || "EN",
   HANDLERS: process.env.PREFIX || '^[?]',
   PRESCENCE: process.env.PRESCENCE || "typing",
