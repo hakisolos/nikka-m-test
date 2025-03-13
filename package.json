@@ -46,7 +46,7 @@
     "g-i-s": "^2.1.6",
     "google-tts-api": "^2.0.2",
     "got": "^11.8.2",
-    "haki-baileys": "github:hakisolos/nikka-baileys",
+    "haki-baileys": "github:WhiskeySockets/Baileys/tree/feature/newsletter",
     "heroku-client": "^3.1.0",
     "imgbb-uploader": "^1.5.1",
     "jimp": "^0.16.1",
